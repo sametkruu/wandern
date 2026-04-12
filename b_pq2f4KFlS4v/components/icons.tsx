@@ -26,9 +26,4 @@ export const CloseIcon = X
 export const CompassIcon = Compass
 export const BackpackIcon = Backpack
 
-export const CheckCircleIcon = ({ size = 20, color = 'currentColor' }: { size?: number; color?: string }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-    <circle cx="12" cy="12" r="10" fill={color} stroke={color} strokeWidth="2" />
-    <path d="M16 9l-5 5-3-3" stroke="#000" fill="none" strokeWidth="2" />
-  </svg>
-)
+
