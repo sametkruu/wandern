@@ -1,0 +1,1248 @@
+"use client"
+
+import { useState, useCallback, useEffect } from 'react'
+import { useVisited, useNotes, usePacking, type NoteEntry } from '@/hooks/use-store'
+import { BREWERIES, ROUTE_DAYS, GUIDE, BREWERY_KM, KM_MAP, VILLAGE_MESSAGES, DAY_TOASTS, STOPS_WAYPOINTS, type Brewery } from '@/lib/data'
+import { 
+  BeerIcon, WheatIcon, TreeIcon, FootIcon, PhoneIcon, GlobeIcon, PinIcon, 
+  AlertIcon, UtensilsIcon, CheckIcon, CheckCircleIcon, ChatIcon, BookIcon, 
+  ChevronIcon, ChevronRightIcon, PenIcon, TrashIcon, PlusIcon, CloseIcon,
+  CompassIcon, BackpackIcon
+} from '@/components/icons'
+import { cn } from '@/lib/utils'
+
+type TabType = 'route' | 'stops' | 'journal'
+
+export default function BrauereiApp() {
+  const [activeTab, setActiveTab] = useState<TabType>('route')
+  const [expandedDays, setExpandedDays] = useState<Set<number>>(new Set([1]))
+  const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set())
+  const [showPackDrawer, setShowPackDrawer] = useState(false)
+  const [showNoteSheet, setShowNoteSheet] = useState(false)
+  const [noteSheetBrewery, setNoteSheetBrewery] = useState<Brewery | null>(null)
+  const [noteType, setNoteType] = useState<'beer' | 'food' | 'comment'>('beer')
+  const [noteText, setNoteText] = useState('')
+  const [editingNote, setEditingNote] = useState<{ breweryId: number; noteId: number } | null>(null)
+  const [showToast, setShowToast] = useState(false)
+  const [toastData, setToastData] = useState<typeof DAY_TOASTS[1] | null>(null)
+  const [miniToast, setMiniToast] = useState<{ icon: string; text: string } | null>(null)
+  const [journalSort, setJournalSort] = useState<'stop' | 'type'>('type')
+  const [showPrompt, setShowPrompt] = useState(false)
+  const [promptLabel, setPromptLabel] = useState('')
+  const [promptValue, setPromptValue] = useState('')
+  const [promptCallback, setPromptCallback] = useState<((value: string) => void) | null>(null)
+  const [headerHidden, setHeaderHidden] = useState(false)
+
+  const { visited, toggleVisited, loaded: visitedLoaded } = useVisited()
+  const { notes, addNote, updateNote, deleteNote, loaded: notesLoaded } = useNotes()
+  const { packed, packList, togglePacked, addPackItem, editPackItem, deletePackItem, addCategory, loaded: packLoaded } = usePacking()
+
+  // Handle scroll for header
+  useEffect(() => {
+    let lastScroll = 0
+    const handleScroll = () => {
+      const st = window.pageYOffset || document.documentElement.scrollTop
+      if (st > lastScroll && st > 60) {
+        setHeaderHidden(true)
+      } else {
+        setHeaderHidden(false)
+      }
+      lastScroll = st < 0 ? 0 : st
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const handleToggleVisit = useCallback((brewery: Brewery) => {
+    const wasVisited = visited.has(brewery.id)
+    toggleVisited(brewery.id)
+    
+    if (!wasVisited) {
+      // Check if village is complete
+      const villageBrews = BREWERIES.filter(b => b.loc === brewery.loc)
+      const newVisited = new Set(visited)
+      newVisited.add(brewery.id)
+      const villageComplete = villageBrews.every(b => newVisited.has(b.id))
+      
+      // Check if day is complete
+      const dayItems = BREWERIES.filter(b => b.day === brewery.day)
+      const dayComplete = dayItems.every(b => newVisited.has(b.id))
+      
+      // Close expanded card
+      setExpandedCards(prev => {
+        const next = new Set(prev)
+        next.delete(brewery.id)
+        return next
+      })
+      
+      if (villageComplete && !dayComplete) {
+        const vm = VILLAGE_MESSAGES[brewery.loc]
+        if (vm) {
+          setMiniToast({ icon: vm.icon, text: vm.msg })
+          setTimeout(() => setMiniToast(null), 5000)
+        }
+      }
+      
+      if (dayComplete) {
+        setTimeout(() => {
+          setToastData(DAY_TOASTS[brewery.day])
+          setShowToast(true)
+        }, 400)
+      }
+    }
+  }, [visited, toggleVisited])
+
+  const handleOpenNoteSheet = useCallback((brewery: Brewery) => {
+    setNoteSheetBrewery(brewery)
+    setNoteType('beer')
+    setNoteText('')
+    setEditingNote(null)
+    setShowNoteSheet(true)
+  }, [])
+
+  const handleEditNote = useCallback((breweryId: number, note: NoteEntry) => {
+    const brewery = BREWERIES.find(b => b.id === breweryId)
+    if (brewery) {
+      setNoteSheetBrewery(brewery)
+      setNoteType(note.type)
+      setNoteText(note.text)
+      setEditingNote({ breweryId, noteId: note.id })
+      setShowNoteSheet(true)
+    }
+  }, [])
+
+  const handleSaveNote = useCallback(() => {
+    if (!noteSheetBrewery || !noteText.trim()) return
+    
+    if (editingNote) {
+      updateNote(editingNote.breweryId, editingNote.noteId, { type: noteType, text: noteText.trim() })
+    } else {
+      addNote(noteSheetBrewery.id, { type: noteType, text: noteText.trim() })
+    }
+    
+    setShowNoteSheet(false)
+    setNoteSheetBrewery(null)
+    setNoteText('')
+    setEditingNote(null)
+  }, [noteSheetBrewery, noteType, noteText, editingNote, addNote, updateNote])
+
+  const openPrompt = useCallback((label: string, value: string, callback: (value: string) => void) => {
+    setPromptLabel(label)
+    setPromptValue(value)
+    setPromptCallback(() => callback)
+    setShowPrompt(true)
+  }, [])
+
+  const handleConfirmPrompt = useCallback(() => {
+    if (promptCallback && promptValue.trim()) {
+      promptCallback(promptValue.trim())
+    }
+    setShowPrompt(false)
+    setPromptCallback(null)
+  }, [promptCallback, promptValue])
+
+  const isDayComplete = useCallback((day: number) => {
+    const dayItems = BREWERIES.filter(b => b.day === day)
+    return dayItems.every(b => visited.has(b.id))
+  }, [visited])
+
+  const switchTab = useCallback((tab: TabType) => {
+    setActiveTab(tab)
+    window.scrollTo(0, 0)
+  }, [])
+
+  const goToDay = useCallback((day: number) => {
+    setExpandedDays(new Set([day]))
+    setExpandedCards(new Set())
+    switchTab('stops')
+    setTimeout(() => {
+      const el = document.getElementById(`day-${day}`)
+      if (el) {
+        if (day === 1) {
+          window.scrollTo(0, 0)
+        } else {
+          el.scrollIntoView({ block: 'start', behavior: 'instant' })
+        }
+      }
+    }, 100)
+  }, [switchTab])
+
+  if (!visitedLoaded || !notesLoaded || !packLoaded) {
+    return (
+      <div className="min-h-screen bg-[#09090b] flex items-center justify-center">
+        <div className="text-zinc-400">Loading...</div>
+      </div>
+    )
+  }
+
+  const totalPacked = packList.reduce((sum, cat) => sum + cat.items.length, 0)
+  const packedCount = packed.size
+
+  return (
+    <div className="min-h-screen bg-[#09090b] text-zinc-300">
+      {/* Header */}
+      <header 
+        className={cn(
+          "fixed top-0 left-0 right-0 z-40 transition-transform duration-300 pointer-events-none",
+          headerHidden && "-translate-y-full"
+        )}
+        style={{ 
+          background: 'linear-gradient(to top, transparent 0%, rgba(9,9,11,0.6) 30%, #09090b 50%)',
+          paddingBottom: '55px'
+        }}
+      >
+        <div className="max-w-[640px] mx-auto px-4 py-3 flex items-center justify-between pointer-events-auto">
+          <div>
+            <h1 className="text-[26px] font-semibold text-zinc-50 tracking-tight">Fränkischer Wandern</h1>
+            <p className="text-[11px] text-zinc-500 font-medium tracking-wide mt-0.5">Der 13 Brauereien Weg</p>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-[640px] mx-auto px-2 pt-[104px] pb-[100px]">
+        {/* Route Tab */}
+        {activeTab === 'route' && (
+          <div className="flex flex-col gap-5 animate-in fade-in slide-in-from-right-10 duration-300">
+            {ROUTE_DAYS.map(day => {
+              const dayComplete = isDayComplete(day.day)
+              return (
+                <div 
+                  key={day.day} 
+                  className="cursor-pointer"
+                  onClick={() => goToDay(day.day)}
+                >
+                  <div className="px-2 py-6">
+                    <p className={cn(
+                      "text-xs font-semibold tracking-wider mb-1",
+                      dayComplete ? "text-emerald-500/70" : "text-zinc-500"
+                    )}>
+                      Day {day.day}
+                    </p>
+                    <h2 className={cn(
+                      "text-2xl font-bold tracking-tight flex items-center gap-3",
+                      dayComplete ? "text-emerald-500" : "text-zinc-50"
+                    )}>
+                      {day.date} <span className={cn(
+                        "text-zinc-500",
+                        dayComplete && "text-emerald-500/60"
+                      )}>·</span> {day.title}
+                      <span className="relative top-1">
+                        {dayComplete ? (
+                          <CheckCircleIcon size={27} color="#12d492" />
+                        ) : (
+                          <ChevronRightIcon size={27} color="#fafafa" />
+                        )}
+                      </span>
+                    </h2>
+                    <p className={cn(
+                      "text-sm font-semibold mt-1",
+                      dayComplete ? "text-emerald-500/70" : "text-zinc-500"
+                    )}>
+                      {day.km}
+                    </p>
+                    
+                    {/* Timeline */}
+                    <div className="mt-5 pl-6">
+                      {day.villages.map((v, i) => (
+                        <div key={i} className="flex gap-3 relative">
+                          <div className="flex flex-col items-center w-5 shrink-0 pt-1">
+                            <div className={cn(
+                              "w-2.5 h-2.5 rounded-full z-10",
+                              v.tag === 'Start' ? "bg-emerald-500" :
+                              v.tag === 'Basecamp' ? "bg-amber-500" :
+                              v.tag === 'Finish' ? "bg-blue-400" :
+                              v.tag === 'Return' ? "bg-violet-400" :
+                              "bg-zinc-600"
+                            )} />
+                            {i < day.villages.length - 1 && (
+                              <div className="w-0.5 flex-1 bg-zinc-800 min-h-[44px]" />
+                            )}
+                          </div>
+                          <div className="pb-4">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-semibold text-zinc-300">{v.n}</span>
+                              {v.tag && (
+                                <span className={cn(
+                                  "text-[9px] font-semibold rounded-md px-1.5 py-0.5 tracking-wider uppercase border",
+                                  v.tag === 'Start' ? "text-emerald-500 bg-emerald-500/10 border-emerald-500/20" :
+                                  v.tag === 'Basecamp' ? "text-amber-500 bg-amber-500/10 border-amber-500/20" :
+                                  v.tag === 'Finish' ? "text-blue-400 bg-blue-400/10 border-blue-400/20" :
+                                  v.tag === 'Return' ? "text-violet-400 bg-violet-400/10 border-violet-400/20" :
+                                  v.tag === 'No stops' ? "text-zinc-600 bg-zinc-500/10 border-zinc-500/30" :
+                                  "text-zinc-500 bg-zinc-500/10 border-zinc-500/20"
+                                )}>
+                                  {v.tag}
+                                </span>
+                              )}
+                              {v.s > 0 && (
+                                <span className="text-[11px] font-semibold text-zinc-500 ml-1">
+                                  {v.s} stop{v.s > 1 ? 's' : ''}
+                                </span>
+                              )}
+                            </div>
+                            {v.d && (
+                              <div className="text-[11px] text-zinc-600 font-medium mt-0.5 flex items-center gap-1">
+                                <FootIcon size={11} color="#71717a" />
+                                {v.d}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <p className="text-[13px] text-zinc-500 leading-relaxed mt-2 pl-6">{day.vibe}</p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {/* Stops Tab */}
+        {activeTab === 'stops' && (
+          <div className="relative flex flex-col gap-2 animate-in fade-in slide-in-from-right-10 duration-300 pb-4">
+            {/* Dotted vertical timeline */}
+            <div 
+              className="absolute top-4 bottom-8 left-[27px] w-[3px] -translate-x-1/2 z-0"
+              style={{
+                background: '#27272a',
+                maskImage: 'radial-gradient(circle 1.5px, #000 100%, transparent 100%)',
+                maskSize: '3px 6px',
+                maskRepeat: 'repeat-y',
+                WebkitMaskImage: 'radial-gradient(circle 1.5px, #000 100%, transparent 100%)',
+                WebkitMaskSize: '3px 6px',
+                WebkitMaskRepeat: 'repeat-y',
+              }}
+            />
+            {[1, 2, 3].map(day => {
+              const dayData = ROUTE_DAYS.find(d => d.day === day)!
+              const isExpanded = expandedDays.has(day)
+              const dayComplete = isDayComplete(day)
+              const dayBreweries = BREWERIES.filter(b => b.day === day)
+              
+              // Group by location
+              const locationGroups: { loc: string; breweries: Brewery[] }[] = []
+              let currentLoc = ''
+              dayBreweries.forEach(b => {
+                if (b.loc !== currentLoc) {
+                  currentLoc = b.loc
+                  locationGroups.push({ loc: b.loc, breweries: [] })
+                }
+                locationGroups[locationGroups.length - 1].breweries.push(b)
+              })
+
+              return (
+                <div key={day} id={`day-${day}`} className="scroll-mt-[104px]">
+                  {/* Day Header */}
+                  <div 
+                    className="px-2 pt-6 pb-4 cursor-pointer relative pl-14"
+                    onClick={() => setExpandedDays(prev => {
+                      const next = new Set(prev)
+                      if (next.has(day)) {
+                        next.delete(day)
+                      } else {
+                        next.add(day)
+                      }
+                      return next
+                    })}
+                  >
+                    {/* Rectangle marker for day headers */}
+                    <div 
+                      className={cn(
+                        "absolute left-[27px] top-6 -translate-x-1/2 w-1.5 h-14 rounded-sm z-10 transition-colors",
+                        dayComplete 
+                          ? (isExpanded ? "bg-emerald-500" : "bg-emerald-700")
+                          : (isExpanded ? "bg-zinc-50" : "bg-zinc-600")
+                      )}
+                      style={{ boxShadow: '0 0 0 4px #09090b' }}
+                    />
+                    <div className="flex items-start gap-3">
+                      <div className="flex-1">
+                        <h2 
+                          className={cn(
+                            "text-[32px] font-bold tracking-tight leading-none transition-colors flex items-center gap-2",
+                            dayComplete
+                              ? (isExpanded ? "text-emerald-500" : "text-emerald-700")
+                              : (isExpanded ? "text-zinc-50" : "text-zinc-600")
+                          )}
+                        >
+                          Day {day}
+                          {dayComplete && (
+                            <CheckCircleIcon 
+                              size={20} 
+                              color={isExpanded ? "#12d492" : "#2a8d65"} 
+                            />
+                          )}
+                        </h2>
+                        <p 
+                          className={cn(
+                            "text-xs font-medium mt-1.5 tracking-wide transition-colors",
+                            dayComplete 
+                              ? (isExpanded ? "text-emerald-500" : "text-emerald-700")
+                              : (isExpanded ? "text-zinc-50" : "text-zinc-600")
+                          )}
+                        >
+                          <span className="font-semibold">{dayData.date}</span>
+                          <span className="text-zinc-500"> · </span>
+                          <span className={cn(
+                            "transition-colors",
+                            dayComplete 
+                              ? (isExpanded ? "text-emerald-500/70" : "text-emerald-700/70")
+                              : "text-zinc-500"
+                          )}>{dayData.title}</span>
+                        </p>
+                        
+                        {/* Collapsed location preview */}
+                        {!isExpanded && (
+                          <p className="text-[11px] text-zinc-600 mt-1 font-medium leading-relaxed">
+                            {locationGroups.map(g => g.loc).join(' · ')}
+                          </p>
+                        )}
+                      </div>
+                      <ChevronIcon 
+                        size={20} 
+                        color="#71717a"
+                        className={cn(
+                          "transition-transform mt-1",
+                          !isExpanded && "-rotate-90"
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Day Content */}
+                  <div className={cn(
+                    "grid transition-all duration-300",
+                    isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                  )}>
+                    <div className="overflow-hidden">
+                      {/* Start waypoints (pass-through villages at beginning of day) */}
+                      {STOPS_WAYPOINTS[day]?.start.map((wp, i) => (
+                        <div key={`start-${wp.n}-${i}`} className="relative z-10 py-5 pl-14">
+                          <div 
+                            className="absolute left-[27px] top-[28px] -translate-x-1/2 w-2 h-2 rounded-full z-10 transition-colors"
+                            style={{ 
+                              background: '#3f3f46',
+                              boxShadow: '0 0 0 3px #09090b' 
+                            }}
+                          />
+                          <span className="text-[10px] font-medium text-zinc-500 mr-2">
+                            {wp.ck}
+                          </span>
+                          <span className="text-[11px] font-semibold text-zinc-500 tracking-wider uppercase">
+                            {wp.n}
+                          </span>
+                          <span className="text-[10px] font-medium text-zinc-500 ml-2">
+                            · {wp.rk}
+                          </span>
+                        </div>
+                      ))}
+                      
+                      {locationGroups.map((group, gi) => (
+                        <div key={group.loc}>
+                          {/* Location Header */}
+                          <div className="relative z-10 py-5 pl-14">
+                            <span className="absolute left-[27px] top-[18px] -translate-x-1/2 bg-[#09090b] p-0.5 rounded">
+                              <FootIcon size={13} color="#3f3f46" />
+                            </span>
+                            <span className="text-[10px] font-medium text-zinc-500 mr-2">
+                              {KM_MAP[group.loc]?.c ? `km ${KM_MAP[group.loc].c}` : ''}
+                            </span>
+                            <span className="text-[11px] font-semibold text-zinc-500 tracking-wider uppercase">
+                              {group.loc}
+                            </span>
+                            {day > 1 && KM_MAP[group.loc]?.r && (
+                              <span className="text-[10px] font-medium text-zinc-500 ml-2">
+                                · km {KM_MAP[group.loc].r}
+                              </span>
+                            )}
+                          </div>
+                          
+                          {/* Brewery Cards */}
+                          {group.breweries.map(brewery => (
+                            <BreweryCard
+                              key={brewery.id}
+                              brewery={brewery}
+                              isVisited={visited.has(brewery.id)}
+                              isExpanded={expandedCards.has(brewery.id)}
+                              onToggleExpand={() => setExpandedCards(prev => {
+                                const next = new Set(prev)
+                                if (next.has(brewery.id)) {
+                                  next.delete(brewery.id)
+                                } else {
+                                  next.add(brewery.id)
+                                }
+                                return next
+                              })}
+                              onToggleVisit={() => handleToggleVisit(brewery)}
+                              onOpenNote={() => handleOpenNoteSheet(brewery)}
+                            />
+                          ))}
+                        </div>
+                      ))}
+                      
+                      {/* End waypoints (pass-through villages at end of day) */}
+                      {STOPS_WAYPOINTS[day]?.end.map((wp, i) => (
+                        <div key={`end-${wp.n}-${i}`} className="relative z-10 py-5 pl-14">
+                          <div 
+                            className="absolute left-[27px] top-[28px] -translate-x-1/2 w-2 h-2 rounded-full z-10 transition-colors"
+                            style={{ 
+                              background: '#3f3f46',
+                              boxShadow: '0 0 0 3px #09090b' 
+                            }}
+                          />
+                          <span className="text-[10px] font-medium text-zinc-500 mr-2">
+                            {wp.ck}
+                          </span>
+                          <span className="text-[11px] font-semibold text-zinc-500 tracking-wider uppercase">
+                            {wp.n}
+                          </span>
+                          <span className="text-[10px] font-medium text-zinc-500 ml-2">
+                            · {wp.rk}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {/* Journal Tab */}
+        {activeTab === 'journal' && (
+          <JournalTab
+            notes={notes}
+            journalSort={journalSort}
+            setJournalSort={setJournalSort}
+            onEditNote={handleEditNote}
+            onDeleteNote={deleteNote}
+          />
+        )}
+      </main>
+
+      {/* Bottom Navigation */}
+      <nav 
+        className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none"
+        style={{ 
+          background: 'linear-gradient(to bottom, transparent 0%, rgba(9,9,11,0.8) 20%, #09090b 45%, #09090b 100%)',
+          paddingTop: '50px',
+          paddingBottom: 'calc(16px + env(safe-area-inset-bottom))'
+        }}
+      >
+        <div className="max-w-[640px] w-full mx-auto px-2 flex justify-between">
+          <div className="pl-2 flex gap-12 pointer-events-auto">
+            <NavButton 
+              icon={<CompassIcon size={22} color={activeTab === 'route' ? '#fafafa' : '#52525b'} strokeWidth={activeTab === 'route' ? 2.5 : 2} />}
+              label="Route"
+              active={activeTab === 'route'}
+              onClick={() => switchTab('route')}
+            />
+            <NavButton 
+              icon={<BeerIcon size={22} color={activeTab === 'stops' ? '#fafafa' : '#52525b'} strokeWidth={activeTab === 'stops' ? 2.5 : 2} />}
+              label="Stops"
+              active={activeTab === 'stops'}
+              onClick={() => switchTab('stops')}
+            />
+            <NavButton 
+              icon={<ChatIcon size={22} color={activeTab === 'journal' ? '#fafafa' : '#52525b'} strokeWidth={activeTab === 'journal' ? 2.5 : 2} />}
+              label="Journal"
+              active={activeTab === 'journal'}
+              onClick={() => switchTab('journal')}
+            />
+          </div>
+          <div className="flex pointer-events-auto pr-3">
+            <NavButton 
+              icon={<BackpackIcon size={22} color="#52525b" />}
+              label="Pack"
+              active={false}
+              onClick={() => setShowPackDrawer(true)}
+              align="end"
+            />
+          </div>
+        </div>
+      </nav>
+
+      {/* Pack Drawer */}
+      <Overlay open={showPackDrawer} onClose={() => setShowPackDrawer(false)}>
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-bold text-zinc-50 flex items-center gap-2">
+                <BackpackIcon size={18} color="#fafafa" />
+                Packing List
+              </h2>
+              <p className="text-xs text-zinc-500 mt-0.5">{packedCount} of {totalPacked} packed</p>
+            </div>
+            <button 
+              onClick={() => setShowPackDrawer(false)}
+              className="p-2 rounded-lg bg-zinc-800 border border-zinc-700"
+            >
+              <CloseIcon size={18} color="#a1a1aa" />
+            </button>
+          </div>
+          
+          {packList.map((category, ci) => (
+            <div key={ci} className="mb-7">
+              <div className="flex items-center justify-between mb-2.5">
+                <p className="text-[10px] font-semibold text-zinc-600 tracking-widest uppercase">
+                  {category.cat}
+                </p>
+                <button 
+                  onClick={() => openPrompt('New item:', '', (text) => addPackItem(ci, text))}
+                  className="p-1"
+                >
+                  <PlusIcon size={14} color="#8a8a92" />
+                </button>
+              </div>
+              {category.items.map(item => (
+                <div 
+                  key={item.id}
+                  className={cn(
+                    "flex items-center gap-3 py-2.5 rounded-lg group",
+                    packed.has(item.id) && "opacity-60"
+                  )}
+                >
+                  <div 
+                    className={cn(
+                      "w-[22px] h-[22px] rounded-md border-2 flex items-center justify-center shrink-0 transition-all cursor-pointer",
+                      packed.has(item.id) 
+                        ? "bg-emerald-700 border-emerald-700" 
+                        : "bg-transparent border-zinc-700"
+                    )}
+                    onClick={() => togglePacked(item.id)}
+                  >
+                    {packed.has(item.id) && <CheckIcon size={14} color="#000" />}
+                  </div>
+                  <span 
+                    className={cn(
+                      "text-sm font-medium flex-1 transition-all cursor-pointer",
+                      packed.has(item.id) 
+                        ? "text-emerald-700 line-through" 
+                        : "text-zinc-300"
+                    )}
+                    onClick={() => togglePacked(item.id)}
+                  >
+                    {item.text}
+                  </span>
+                  <div className="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        openPrompt('Edit item:', item.text, (text) => editPackItem(item.id, text))
+                      }}
+                      className="p-1.5 rounded-lg bg-zinc-800"
+                    >
+                      <PenIcon size={12} color="#a1a1aa" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        deletePackItem(item.id)
+                      }}
+                      className="p-1.5 rounded-lg bg-red-500/20"
+                    >
+                      <TrashIcon size={12} color="#f87171" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+          
+          <button 
+            onClick={() => openPrompt('Category name:', '', addCategory)}
+            className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-lg border border-dashed border-zinc-700 text-zinc-50 text-[13px] font-semibold mt-2"
+          >
+            <PlusIcon size={14} color="#fafafa" />
+            Add category
+          </button>
+        </div>
+      </Overlay>
+
+      {/* Note Sheet */}
+      <Overlay open={showNoteSheet} onClose={() => setShowNoteSheet(false)}>
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-base font-bold text-zinc-50">
+                {editingNote ? 'Edit Entry' : 'Add Entry'}
+              </h2>
+              {noteSheetBrewery && (
+                <p className="text-xs text-zinc-500 mt-0.5">
+                  {noteSheetBrewery.name} · {noteSheetBrewery.loc}
+                </p>
+              )}
+            </div>
+            <button 
+              onClick={() => setShowNoteSheet(false)}
+              className="p-2 rounded-lg bg-zinc-800 border border-zinc-700"
+            >
+              <CloseIcon size={18} color="#a1a1aa" />
+            </button>
+          </div>
+          
+          <div className="flex gap-2.5 mb-3">
+            {(['beer', 'food', 'comment'] as const).map(type => {
+              const colors = { beer: '#f59e0b', food: '#a78bfa', comment: '#1284ED' }
+              const labels = { beer: 'Beer', food: 'Food', comment: 'Note' }
+              const icons = { 
+                beer: <BeerIcon size={15} color="currentColor" />,
+                food: <UtensilsIcon size={15} color="currentColor" />,
+                comment: <ChatIcon size={15} color="currentColor" />
+              }
+              const isActive = noteType === type
+              return (
+                <button
+                  key={type}
+                  onClick={() => setNoteType(type)}
+                  className={cn(
+                    "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg border text-[13px] font-semibold transition-all",
+                    isActive 
+                      ? "border-current bg-current/10" 
+                      : "border-white/10 text-zinc-500"
+                  )}
+                  style={isActive ? { color: colors[type], borderColor: `${colors[type]}40` } : {}}
+                >
+                  {icons[type]}
+                  {labels[type]}
+                </button>
+              )
+            })}
+          </div>
+          
+          <textarea
+            value={noteText}
+            onChange={(e) => setNoteText(e.target.value)}
+            placeholder="What did you think?"
+            className="w-full p-3 rounded-lg border border-zinc-700 bg-zinc-800 text-zinc-300 text-base resize-none h-[100px] outline-none focus:border-zinc-600"
+          />
+          
+          <button
+            onClick={handleSaveNote}
+            className="w-full mt-3 py-3 rounded-lg bg-zinc-300 text-zinc-900 text-sm font-bold"
+          >
+            Save Entry
+          </button>
+        </div>
+      </Overlay>
+
+      {/* Prompt Dialog */}
+      <Overlay open={showPrompt} onClose={() => setShowPrompt(false)}>
+        <div className="p-6">
+          <p className="text-sm font-semibold text-zinc-50 mb-3">{promptLabel}</p>
+          <input
+            type="text"
+            value={promptValue}
+            onChange={(e) => setPromptValue(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleConfirmPrompt()}
+            className="w-full p-3 rounded-lg border border-zinc-700 bg-zinc-800 text-zinc-300 text-base outline-none focus:border-zinc-600"
+            autoFocus
+          />
+          <div className="flex gap-2 mt-3">
+            <button
+              onClick={handleConfirmPrompt}
+              className="flex-1 py-3 rounded-lg bg-zinc-300 text-zinc-900 text-sm font-bold"
+            >
+              Done
+            </button>
+            <button
+              onClick={() => setShowPrompt(false)}
+              className="px-5 py-3 rounded-lg border border-zinc-700 text-zinc-500 text-sm font-semibold"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </Overlay>
+
+      {/* Day Complete Toast */}
+      {showToast && toastData && (
+        <div className="fixed inset-0 z-[200] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 text-center w-[80%] max-w-[640px] animate-in zoom-in-95 duration-300">
+            <div className="text-5xl mb-4">{toastData.i}</div>
+            <div className="text-sm font-medium text-zinc-500 mb-1">{toastData.t}</div>
+            <div className="text-2xl font-bold text-zinc-50 mb-1.5 tracking-tight">{toastData.r}</div>
+            <div className="text-[13px] font-semibold text-emerald-500 mb-3">Complete ✓</div>
+            <p className="text-sm text-zinc-500 leading-relaxed mb-2">{toastData.s}</p>
+            <p className="text-[13px] text-zinc-600 leading-relaxed mb-5">{toastData.n}</p>
+            <button
+              onClick={() => setShowToast(false)}
+              className="w-full py-3 rounded-xl bg-zinc-800 text-zinc-300 text-sm font-semibold"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Mini Toast */}
+      {miniToast && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-zinc-900 border border-zinc-800 rounded-xl px-5 py-3.5 flex items-center gap-3 z-[90] w-[80%] max-w-[640px] shadow-2xl animate-in slide-in-from-bottom-5 fade-in duration-300">
+          <span className="text-2xl shrink-0">{miniToast.icon}</span>
+          <span className="text-[13px] font-medium text-zinc-300">
+            <span className="font-bold text-zinc-50">{miniToast.text.split(' — ')[0]}</span>
+            {' — '}
+            {miniToast.text.split(' — ')[1]}
+          </span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Brewery Card Component
+function BreweryCard({ 
+  brewery, 
+  isVisited, 
+  isExpanded, 
+  onToggleExpand, 
+  onToggleVisit,
+  onOpenNote 
+}: { 
+  brewery: Brewery
+  isVisited: boolean
+  isExpanded: boolean
+  onToggleExpand: () => void
+  onToggleVisit: () => void
+  onOpenNote: () => void
+}) {
+  const isBrew = brewery.type === 'brewery'
+  const km = BREWERY_KM[brewery.id]
+  const guide = GUIDE[brewery.id]
+  
+  const activeColor = isVisited ? '#2a8d65' : (isExpanded ? '#fafafa' : '#8a8a92')
+  const visitedColor = '#2a8d65'
+
+  return (
+    <div className="relative z-10 mb-3 scroll-mt-[104px]">
+      {/* Header */}
+      <div 
+        className="py-4 pl-14 pr-4 flex items-start gap-3 cursor-pointer relative"
+        onClick={onToggleExpand}
+      >
+        <span 
+          className="absolute left-[27px] top-8 -translate-x-1/2 -translate-y-1/2 bg-[#09090b] p-1 rounded z-10"
+          style={{ transform: 'translate(-50%, -50%) scale(1.6)' }}
+        >
+          {isBrew 
+            ? <WheatIcon size={15} color={isVisited ? visitedColor : activeColor} strokeWidth={2.5} />
+            : <TreeIcon size={15} color={isVisited ? visitedColor : activeColor} strokeWidth={2.5} />
+          }
+        </span>
+        
+        <div className="flex-1 min-w-0">
+          <h3 
+            className="text-2xl font-semibold tracking-tight leading-tight flex items-center gap-1.5"
+            style={{ color: isVisited ? (isExpanded ? '#12d492' : visitedColor) : activeColor }}
+          >
+            {brewery.name}
+          </h3>
+          <p 
+            className="text-[11px] mt-1.5"
+            style={{ color: isVisited ? visitedColor : 'var(--muted-foreground)' }}
+          >
+            {brewery.loc} · {isBrew ? 'Brewery' : 'Beergarden'} · {km?.c || '?'}
+            {brewery.food && (
+              <span className="inline-flex align-middle relative -top-px ml-1">
+                <UtensilsIcon size={12} color={isVisited ? visitedColor : '#8a8a92'} />
+              </span>
+            )}
+          </p>
+          {isExpanded && (
+            <p className="text-[11px] mt-1" style={{ color: isVisited ? visitedColor : 'var(--muted-foreground)' }}>
+              {brewery.price} · {brewery.hours}
+            </p>
+          )}
+        </div>
+        
+        <div 
+          className={cn(
+            "w-[26px] h-[26px] rounded-lg border-2 flex items-center justify-center shrink-0 mt-2 transition-all cursor-pointer"
+          )}
+          style={{ 
+            borderColor: isVisited ? visitedColor : 'var(--border)',
+            background: isVisited ? visitedColor : 'transparent'
+          }}
+          onClick={(e) => { e.stopPropagation(); onToggleVisit() }}
+        >
+          {isVisited && <CheckIcon size={14} color="#000" strokeWidth={3} />}
+        </div>
+      </div>
+      
+      {/* Body */}
+      <div className={cn(
+        "overflow-hidden transition-all duration-300 pl-14 pr-4",
+        isExpanded ? "max-h-[2000px] opacity-100 pb-6" : "max-h-0 opacity-0"
+      )}>
+        {/* Tags */}
+        <div className="flex flex-wrap gap-1.5 mb-5">
+          <a 
+            href={`tel:${brewery.phone.replace(/\s+/g, '')}`}
+            className="inline-flex items-center gap-1.5 bg-zinc-800 px-2 py-1.5 rounded-lg text-[11px] font-semibold text-zinc-300"
+          >
+            <PhoneIcon size={12} color="#a1a1aa" />
+            {brewery.phone}
+          </a>
+          {brewery.web && (
+            <a 
+              href={`https://${brewery.web}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 bg-zinc-800 px-2 py-1.5 rounded-lg text-[11px] font-semibold text-zinc-300"
+            >
+              <GlobeIcon size={12} color="#a1a1aa" />
+              Web
+            </a>
+          )}
+          <a 
+            href={`https://maps.google.com/?q=${brewery.q}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 bg-zinc-800 px-2 py-1.5 rounded-lg text-[11px] font-semibold text-zinc-300"
+          >
+            <PinIcon size={12} color="#a1a1aa" />
+            Maps
+          </a>
+        </div>
+        
+        {/* Beer */}
+        {brewery.beer && (
+          <div className="mt-5">
+            <div className="flex items-center gap-2 mb-2.5 relative min-h-[22px]">
+              <span className="absolute -left-10 top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
+                <BeerIcon size={15} color="#8a8a92" />
+              </span>
+              <span className="text-[13px] font-semibold text-zinc-500">Beer</span>
+            </div>
+            <p className="text-[13px] text-zinc-500 leading-relaxed">{brewery.beer}</p>
+          </div>
+        )}
+        
+        {/* Food */}
+        {brewery.food && (
+          <div className="mt-5">
+            <div className="flex items-center gap-2 mb-2.5 relative min-h-[22px]">
+              <span className="absolute -left-10 top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
+                <UtensilsIcon size={15} color="#8a8a92" />
+              </span>
+              <span className="text-[13px] font-semibold text-zinc-500">Food</span>
+            </div>
+            <p className="text-[13px] text-zinc-500 leading-relaxed">{brewery.food}</p>
+          </div>
+        )}
+        
+        {/* Guide */}
+        {guide && (
+          <div className="mt-5">
+            <div className="flex items-center gap-2 mb-2.5 relative min-h-[22px]">
+              <span className="absolute -left-10 top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
+                <BookIcon size={15} color="#8a8a92" />
+              </span>
+              <span className="text-[13px] font-semibold text-zinc-500">From the guide</span>
+            </div>
+            <p 
+              className="text-[13px] text-zinc-500 leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: guide }}
+            />
+          </div>
+        )}
+        
+        {/* Warning */}
+        <div className="mt-5">
+          <div className="flex items-center gap-2 mb-2.5 relative min-h-[22px]">
+            <span className="absolute -left-10 top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
+              <AlertIcon size={15} color="#f59e0b" />
+            </span>
+            <span className="text-[13px] font-semibold text-amber-500">Heads up</span>
+          </div>
+          <p className="text-[13px] text-amber-500/45 leading-relaxed">{brewery.avoid}</p>
+        </div>
+        
+        {/* Actions */}
+        <div className="flex gap-2 mt-4">
+          <button 
+            onClick={(e) => { e.stopPropagation(); onOpenNote() }}
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg border border-dashed border-zinc-700 text-zinc-50 text-[13px] font-semibold"
+          >
+            <PlusIcon size={14} color="#fafafa" />
+            Add Entry
+          </button>
+          <button 
+            onClick={(e) => { e.stopPropagation(); onToggleVisit() }}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg border border-dashed text-[13px] font-semibold",
+              isVisited 
+                ? "border-emerald-600 text-emerald-500" 
+                : "border-zinc-700 text-zinc-50"
+            )}
+          >
+            <CheckIcon size={14} color={isVisited ? '#3aab7a' : '#fafafa'} />
+            Visited
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Journal Tab Component
+function JournalTab({ 
+  notes, 
+  journalSort, 
+  setJournalSort,
+  onEditNote,
+  onDeleteNote
+}: { 
+  notes: Record<number, NoteEntry[]>
+  journalSort: 'stop' | 'type'
+  setJournalSort: (s: 'stop' | 'type') => void
+  onEditNote: (breweryId: number, note: NoteEntry) => void
+  onDeleteNote: (breweryId: number, noteId: number) => void
+}) {
+  const allNotes: { brew: Brewery | undefined; entry: NoteEntry; brewId: number }[] = []
+  
+  for (const bid in notes) {
+    if (!notes[bid]?.length) continue
+    const brewery = BREWERIES.find(b => b.id === Number(bid))
+    notes[bid].forEach(entry => {
+      allNotes.push({ brew: brewery, entry, brewId: Number(bid) })
+    })
+  }
+  
+  const totalCount = allNotes.length
+
+  if (!totalCount) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-260px)] text-center animate-in fade-in slide-in-from-left-10 duration-300">
+        <div className="text-3xl font-bold text-zinc-50 tracking-tight">No entries yet</div>
+        <div className="text-[11px] font-medium text-zinc-600 mt-2 tracking-wide">
+          Open a stop and tap Add Entry to start your journal
+        </div>
+      </div>
+    )
+  }
+
+  const noteTypeConfig = {
+    beer: { 
+      icon: () => <BeerIcon size={19} color="#f59e0b" strokeWidth={2.5} />, 
+      label: 'Beer', 
+      color: '#f59e0b' 
+    },
+    food: { 
+      icon: () => <UtensilsIcon size={18} color="#a78bfa" />, 
+      label: 'Food', 
+      color: '#a78bfa' 
+    },
+    comment: { 
+      icon: () => <ChatIcon size={18} color="#1284ED" />, 
+      label: 'Note', 
+      color: '#1284ED' 
+    }
+  }
+
+  return (
+    <div className="animate-in fade-in slide-in-from-left-10 duration-300">
+      <div className="flex items-center justify-between mb-5">
+        <span className="text-[13px] font-semibold text-zinc-500">
+          {totalCount} entr{totalCount === 1 ? 'y' : 'ies'}
+        </span>
+        <div className="flex gap-1">
+          <button
+            onClick={() => setJournalSort('stop')}
+            className={cn(
+              "px-3 py-1.5 rounded-lg border text-[11px] font-semibold",
+              journalSort === 'stop' 
+                ? "border-zinc-500 bg-zinc-800 text-zinc-300" 
+                : "border-zinc-700 bg-transparent text-zinc-600"
+            )}
+          >
+            By Stop
+          </button>
+          <button
+            onClick={() => setJournalSort('type')}
+            className={cn(
+              "px-3 py-1.5 rounded-lg border text-[11px] font-semibold",
+              journalSort === 'type' 
+                ? "border-zinc-500 bg-zinc-800 text-zinc-300" 
+                : "border-zinc-700 bg-transparent text-zinc-600"
+            )}
+          >
+            By Type
+          </button>
+        </div>
+      </div>
+
+      {journalSort === 'stop' ? (
+        // Group by stop
+        (() => {
+          const grouped: Record<number, { brew: Brewery | undefined; entries: NoteEntry[] }> = {}
+          allNotes.forEach(n => {
+            if (!grouped[n.brewId]) grouped[n.brewId] = { brew: n.brew, entries: [] }
+            grouped[n.brewId].entries.push(n.entry)
+          })
+          
+          return Object.entries(grouped).map(([gid, g]) => {
+            const isBrew = g.brew?.type === 'brewery'
+            return (
+              <div key={gid} className="mb-5">
+                <div className="flex items-center gap-2 mb-2.5">
+                  {isBrew 
+                    ? <WheatIcon size={15} color="#8a8a92" />
+                    : <TreeIcon size={15} color="#8a8a92" />
+                  }
+                  <span className="text-sm font-semibold text-zinc-300">{g.brew?.name || 'Unknown'}</span>
+                  <span className="text-[11px] text-zinc-600">{g.brew?.loc || ''}</span>
+                </div>
+                {g.entries.map(entry => {
+                  const cfg = noteTypeConfig[entry.type] || noteTypeConfig.comment
+                  return (
+                    <div 
+                      key={entry.id}
+                      className="relative overflow-hidden rounded-xl mb-1.5"
+                      style={{ background: `${cfg.color}10` }}
+                    >
+                      <div className="flex gap-2.5 p-3 items-start">
+                        <div className="pt-1.5">{cfg.icon()}</div>
+                        <p 
+                          className="flex-1 text-[15px] leading-relaxed pt-1.5 break-words"
+                          style={{ color: cfg.color, opacity: 0.7 }}
+                        >
+                          {entry.text}
+                        </p>
+                        <div className="flex gap-1 shrink-0">
+                          <button
+                            onClick={() => onEditNote(Number(gid), entry)}
+                            className="p-1.5 rounded-lg bg-white/10 backdrop-blur-xl"
+                          >
+                            <PenIcon size={14} color="#d4d4d8" />
+                          </button>
+                          <button
+                            onClick={() => onDeleteNote(Number(gid), entry.id)}
+                            className="p-1.5 rounded-lg bg-red-500/20 backdrop-blur-xl"
+                          >
+                            <TrashIcon size={14} color="#f87171" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )
+          })
+        })()
+      ) : (
+        // Group by type
+        (['beer', 'food', 'comment'] as const).map(type => {
+          const items = allNotes.filter(n => n.entry.type === type)
+          if (!items.length) return null
+          const cfg = noteTypeConfig[type]
+          
+          return (
+            <div key={type} className="mb-6">
+              <div className="flex items-center gap-2 mb-2.5">
+                {cfg.icon()}
+                <span className="text-sm font-semibold" style={{ color: cfg.color }}>{cfg.label}</span>
+                <span className="text-[11px] text-zinc-600">{items.length}</span>
+              </div>
+              {items.map(n => (
+                <div 
+                  key={n.entry.id}
+                  className="relative overflow-hidden rounded-xl mb-1.5 bg-zinc-900"
+                >
+                  <div className="flex gap-2.5 p-3 items-center">
+                    <div className="flex-1 pt-1">
+                      <div className="text-[11px] font-medium text-zinc-600 mb-0.5">
+                        {n.brew?.name} · {n.brew?.loc}
+                      </div>
+                      <p className="text-[15px] text-zinc-500 break-words">{n.entry.text}</p>
+                    </div>
+                    <div className="flex gap-1 shrink-0">
+                      <button
+                        onClick={() => onEditNote(n.brewId, n.entry)}
+                        className="p-1.5 rounded-lg bg-white/10 backdrop-blur-xl"
+                      >
+                        <PenIcon size={14} color="#d4d4d8" />
+                      </button>
+                      <button
+                        onClick={() => onDeleteNote(n.brewId, n.entry.id)}
+                        className="p-1.5 rounded-lg bg-red-500/20 backdrop-blur-xl"
+                      >
+                        <TrashIcon size={14} color="#f87171" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
+        })
+      )}
+    </div>
+  )
+}
+
+// Nav Button Component
+function NavButton({ 
+  icon, 
+  label, 
+  active, 
+  onClick,
+  align = 'start'
+}: { 
+  icon: React.ReactNode
+  label: string
+  active: boolean
+  onClick: () => void
+  align?: 'start' | 'end'
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "flex flex-col gap-1.5 py-2",
+        align === 'end' ? "items-end" : "items-start"
+      )}
+    >
+      {icon}
+      <span 
+        className="text-[10px] font-semibold tracking-wider uppercase"
+        style={{ color: active ? '#fafafa' : '#52525b' }}
+      >
+        {label}
+      </span>
+    </button>
+  )
+}
+
+// Overlay Component
+function Overlay({ 
+  open, 
+  onClose, 
+  children 
+}: { 
+  open: boolean
+  onClose: () => void
+  children: React.ReactNode
+}) {
+  if (!open) return null
+  
+  return (
+    <div className="fixed inset-0 z-[100] flex flex-col justify-end">
+      <div 
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
+        onClick={onClose}
+      />
+      <div className="relative bg-zinc-900 rounded-t-3xl max-h-[85dvh] overflow-y-auto animate-in slide-in-from-bottom duration-300">
+        <div className="flex justify-center pt-2.5 pb-0">
+          <div className="w-9 h-1 rounded-full bg-zinc-700" />
+        </div>
+        {children}
+      </div>
+    </div>
+  )
+}
