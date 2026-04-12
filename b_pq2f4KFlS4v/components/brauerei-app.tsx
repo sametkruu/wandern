@@ -369,7 +369,7 @@ export default function BrauereiApp() {
                 <div key={day} id={`day-${day}`} className="scroll-mt-[104px]">
                   {/* Day Header */}
                   <div 
-                    className="pt-6 pb-4 cursor-pointer relative pl-[40px]"
+                    className="pt-6 pb-4 cursor-pointer relative pl-[32px]"
                     onClick={() => setExpandedDays(prev => {
                       const next = new Set(prev)
                       if (next.has(day)) {
@@ -449,7 +449,7 @@ export default function BrauereiApp() {
                     <div className="overflow-hidden">
                       {/* Start waypoints (pass-through villages at beginning of day) */}
                       {STOPS_WAYPOINTS[day]?.start.map((wp, i) => (
-                        <div key={`start-${wp.n}-${i}`} className="relative z-10 py-2 pl-[40px]">
+                        <div key={`start-${wp.n}-${i}`} className="relative z-10 py-2 pl-[32px]">
                           <div 
                             className="absolute left-[15px] top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full z-10 transition-colors"
                             style={{ 
@@ -474,7 +474,7 @@ export default function BrauereiApp() {
                         return (
                         <div key={group.loc}>
                           {/* Location Header */}
-                          <div className="relative z-10 py-2 pl-[40px]">
+                          <div className="relative z-10 py-2 pl-[32px]">
                             <div 
                               className="absolute left-[15px] top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full z-10 transition-colors"
                               style={{ background: villageComplete ? '#2a8d65' : '#3f3f46', boxShadow: '0 0 0 3px #09090b' }}
@@ -527,7 +527,7 @@ export default function BrauereiApp() {
                       
                       {/* End waypoints (pass-through villages at end of day) */}
                       {STOPS_WAYPOINTS[day]?.end.map((wp, i) => (
-                        <div key={`end-${wp.n}-${i}`} className="relative z-10 py-2 pl-[40px]">
+                        <div key={`end-${wp.n}-${i}`} className="relative z-10 py-2 pl-[32px]">
                           <div 
                             className="absolute left-[15px] top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full z-10 transition-colors"
                             style={{ 
@@ -868,7 +868,7 @@ function BreweryCard({
     <div id={`brewery-${brewery.id}`} className="relative z-10 mb-3 scroll-mt-[104px]">
       {/* Header */}
       <div 
-        className="py-4 pl-[40px] flex items-start gap-3 cursor-pointer relative"
+        className="py-4 pl-[32px] flex items-start gap-3 cursor-pointer relative"
         onClick={onToggleExpand}
       >
         <span 
@@ -921,7 +921,7 @@ function BreweryCard({
       
       {/* Body */}
       <div className={cn(
-        "overflow-hidden transition-all duration-500 ease-in-out pl-[40px]",
+        "overflow-hidden transition-all duration-500 ease-in-out pl-[32px]",
         isExpanded ? "max-h-[2000px] opacity-100 pb-6" : "max-h-0 opacity-0"
       )}>
         {/* Tags */}
