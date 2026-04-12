@@ -11,8 +11,8 @@ import {
 } from '@/components/icons'
 import { cn } from '@/lib/utils'
 
-type TabType = 'route' | 'stops' | 'journal'
-const TAB_ORDER: TabType[] = ['route', 'stops', 'journal']
+type TabType = 'route' | 'stops' | 'journal' | 'pack'
+const TAB_ORDER: TabType[] = ['route', 'stops', 'journal', 'pack']
 
 // Map route village display names to brewery loc names where they differ
 const ROUTE_TO_LOC: Record<string, string> = {
@@ -24,7 +24,6 @@ export default function BrauereiApp() {
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right')
   const [expandedDays, setExpandedDays] = useState<Set<number>>(new Set([1]))
   const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set())
-  const [showPackDrawer, setShowPackDrawer] = useState(false)
   const [showNoteSheet, setShowNoteSheet] = useState(false)
   const [noteSheetBrewery, setNoteSheetBrewery] = useState<Brewery | null>(null)
   const [noteType, setNoteType] = useState<'beer' | 'food' | 'comment'>('beer')
@@ -572,6 +571,102 @@ export default function BrauereiApp() {
             slideDirection={slideDirection}
           />
         )}
+
+        {/* Pack Tab */}
+        {activeTab === 'pack' && (
+          <div className={cn("flex flex-col animate-in fade-in duration-300", slideDirection === 'right' ? "tab-slide-from-right" : "tab-slide-from-left")}>
+            <div className="mb-5">
+              <h2 className="text-2xl font-bold text-zinc-50 flex items-center gap-2 tracking-tight">
+                <BackpackIcon size={20} color="#fafafa" />
+                Packing List
+              </h2>
+              <p className="text-xs text-zinc-500 mt-1">{packedCount} of {totalPacked} packed</p>
+            </div>
+
+            <SwipeGroup>
+            {packList.map((category, ci) => (
+              <div key={ci} className="mb-7">
+                <div className="flex items-center justify-between mb-2.5">
+                  <p className="text-[10px] font-semibold text-zinc-600 tracking-widest uppercase">
+                    {category.cat}
+                  </p>
+                  <button 
+                    onClick={() => openPrompt('New item:', '', (text) => addPackItem(ci, text))}
+                    className="p-1"
+                  >
+                    <PlusIcon size={14} color="#8a8a92" />
+                  </button>
+                </div>
+                {category.items.map(item => {
+                  const packActions = (
+                    <>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          openPrompt('Edit item:', item.text, (text) => editPackItem(item.id, text))
+                        }}
+                        className="flex items-center justify-center px-4 rounded-lg bg-zinc-700"
+                      >
+                        <PenIcon size={18} color="#a1a1aa" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          deletePackItem(item.id)
+                        }}
+                        className="flex items-center justify-center px-4 rounded-lg bg-red-500/20"
+                      >
+                        <TrashIcon size={18} color="#f87171" />
+                      </button>
+                    </>
+                  )
+                  return (
+                    <SwipeableItem
+                      key={item.id}
+                      actions={packActions}
+                      bgColor="#18181b"
+                      className={cn("rounded-lg", packed.has(item.id) && "opacity-60")}
+                    >
+                      <div className="flex items-center gap-3 py-2.5">
+                        <div 
+                          className={cn(
+                            "w-[22px] h-[22px] rounded-md border-2 flex items-center justify-center shrink-0 transition-all cursor-pointer",
+                            packed.has(item.id) 
+                              ? "bg-emerald-700 border-emerald-700" 
+                              : "bg-transparent border-zinc-700"
+                          )}
+                          onClick={() => togglePacked(item.id)}
+                        >
+                          {packed.has(item.id) && <CheckIcon size={14} color="#000" />}
+                        </div>
+                        <span 
+                          className={cn(
+                            "text-sm font-medium flex-1 transition-all cursor-pointer",
+                            packed.has(item.id) 
+                              ? "text-emerald-700 line-through" 
+                              : "text-zinc-300"
+                          )}
+                          onClick={() => togglePacked(item.id)}
+                        >
+                          {item.text}
+                        </span>
+                      </div>
+                    </SwipeableItem>
+                  )
+                })}
+              </div>
+            ))}
+            </SwipeGroup>
+
+            <button 
+              onClick={() => openPrompt('Category name:', '', addCategory)}
+              className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-lg border border-dashed border-zinc-700 text-zinc-50 text-[13px] font-semibold mt-2"
+            >
+              <PlusIcon size={14} color="#fafafa" />
+              Add category
+            </button>
+          </div>
+        )}
       </main>
 
       {/* Bottom Navigation */}
@@ -606,122 +701,18 @@ export default function BrauereiApp() {
           </div>
           <div className="flex pointer-events-auto">
             <NavButton 
-              icon={<BackpackIcon size={22} color="#52525b" />}
+              icon={<BackpackIcon size={22} color={activeTab === 'pack' ? '#fafafa' : '#52525b'} strokeWidth={activeTab === 'pack' ? 2.5 : 2} />}
               label="Pack"
-              active={false}
-              onClick={() => setShowPackDrawer(true)}
+              active={activeTab === 'pack'}
+              onClick={() => switchTab('pack')}
               align="end"
             />
           </div>
         </div>
       </nav>
 
-      {/* Pack Drawer */}
-      <Overlay open={showPackDrawer} onClose={() => setShowPackDrawer(false)}>
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-lg font-bold text-zinc-50 flex items-center gap-2">
-                <BackpackIcon size={18} color="#fafafa" />
-                Packing List
-              </h2>
-              <p className="text-xs text-zinc-500 mt-0.5">{packedCount} of {totalPacked} packed</p>
-            </div>
-            <button 
-              onClick={() => setShowPackDrawer(false)}
-              className="p-2 rounded-lg bg-zinc-800 border border-zinc-700"
-            >
-              <CloseIcon size={18} color="#a1a1aa" />
-            </button>
-          </div>
-          
-          <SwipeGroup>
-          {packList.map((category, ci) => (
-            <div key={ci} className="mb-7">
-              <div className="flex items-center justify-between mb-2.5">
-                <p className="text-[10px] font-semibold text-zinc-600 tracking-widest uppercase">
-                  {category.cat}
-                </p>
-                <button 
-                  onClick={() => openPrompt('New item:', '', (text) => addPackItem(ci, text))}
-                  className="p-1"
-                >
-                  <PlusIcon size={14} color="#8a8a92" />
-                </button>
-              </div>
-              {category.items.map(item => {
-                const packActions = (
-                  <>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        openPrompt('Edit item:', item.text, (text) => editPackItem(item.id, text))
-                      }}
-                      className="flex items-center justify-center px-4 rounded-lg bg-zinc-700"
-                    >
-                      <PenIcon size={18} color="#a1a1aa" />
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        deletePackItem(item.id)
-                      }}
-                      className="flex items-center justify-center px-4 rounded-lg bg-red-500/20"
-                    >
-                      <TrashIcon size={18} color="#f87171" />
-                    </button>
-                  </>
-                )
-                return (
-                  <SwipeableItem
-                    key={item.id}
-                    actions={packActions}
-                    bgColor="#18181b"
-                    className={cn("rounded-lg", packed.has(item.id) && "opacity-60")}
-                  >
-                    <div className="flex items-center gap-3 py-2.5">
-                      <div 
-                        className={cn(
-                          "w-[22px] h-[22px] rounded-md border-2 flex items-center justify-center shrink-0 transition-all cursor-pointer",
-                          packed.has(item.id) 
-                            ? "bg-emerald-700 border-emerald-700" 
-                            : "bg-transparent border-zinc-700"
-                        )}
-                        onClick={() => togglePacked(item.id)}
-                      >
-                        {packed.has(item.id) && <CheckIcon size={14} color="#000" />}
-                      </div>
-                      <span 
-                        className={cn(
-                          "text-sm font-medium flex-1 transition-all cursor-pointer",
-                          packed.has(item.id) 
-                            ? "text-emerald-700 line-through" 
-                            : "text-zinc-300"
-                        )}
-                        onClick={() => togglePacked(item.id)}
-                      >
-                        {item.text}
-                      </span>
-                    </div>
-                  </SwipeableItem>
-                )
-              })}
-            </div>
-          ))}
-          </SwipeGroup>
-          
-          <button 
-            onClick={() => openPrompt('Category name:', '', addCategory)}
-            className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-lg border border-dashed border-zinc-700 text-zinc-50 text-[13px] font-semibold mt-2"
-          >
-            <PlusIcon size={14} color="#fafafa" />
-            Add category
-          </button>
-        </div>
-      </Overlay>
-
-      {/* Note Sheet */}
-      <Overlay open={showNoteSheet} onClose={() => setShowNoteSheet(false)}>
+      {/* Note Modal */}
+      <Modal open={showNoteSheet} onClose={() => setShowNoteSheet(false)}>
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -785,10 +776,10 @@ export default function BrauereiApp() {
             Save Note
           </button>
         </div>
-      </Overlay>
+      </Modal>
 
-      {/* Prompt Dialog */}
-      <Overlay open={showPrompt} onClose={() => setShowPrompt(false)}>
+      {/* Prompt Modal */}
+      <Modal open={showPrompt} onClose={() => setShowPrompt(false)}>
         <div className="p-6">
           <p className="text-sm font-semibold text-zinc-50 mb-3">{promptLabel}</p>
           <input
@@ -814,7 +805,7 @@ export default function BrauereiApp() {
             </button>
           </div>
         </div>
-      </Overlay>
+      </Modal>
 
       {/* Day Complete Toast */}
       {showToast && toastData && (
@@ -1287,8 +1278,8 @@ function NavButton({
   )
 }
 
-// Overlay Component
-function Overlay({ 
+// Modal Component – centered dialog with blurred backdrop and rounded corners
+function Modal({ 
   open, 
   onClose, 
   children 
@@ -1297,13 +1288,6 @@ function Overlay({
   onClose: () => void
   children: React.ReactNode
 }) {
-  const [dragY, setDragY] = useState(0)
-  const startYRef = useRef(0)
-  const startXRef = useRef(0)
-  const isDraggingRef = useRef(false)
-  const sheetRef = useRef<HTMLDivElement>(null)
-
-  // Lock body scroll while sheet is open so background content can't scroll
   useEffect(() => {
     if (!open) return
     const prev = document.body.style.overflow
@@ -1313,62 +1297,14 @@ function Overlay({
 
   if (!open) return null
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (sheetRef.current && sheetRef.current.scrollTop === 0) {
-      startYRef.current = e.touches[0].clientY
-      startXRef.current = e.touches[0].clientX
-      isDraggingRef.current = true
-    }
-  }
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDraggingRef.current) return
-    const dy = e.touches[0].clientY - startYRef.current
-    const dx = e.touches[0].clientX - startXRef.current
-    // Only drag if primarily vertical downward movement
-    if (dy > 0 && dy > Math.abs(dx)) {
-      setDragY(dy)
-    }
-  }
-
-  const handleTouchEnd = () => {
-    isDraggingRef.current = false
-    if (dragY > 80) {
-      setDragY(0)
-      onClose()
-    } else {
-      setDragY(0)
-    }
-  }
-
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col justify-end">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
       <div 
         className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={onClose}
       />
-      {/* Outer wrapper: rounded corners, bg-fill, safe-area padding, drag transform and
-          slide-in animation all live here so the background never cuts out */}
-      <div 
-        className="relative shrink-0 bg-zinc-900 rounded-t-3xl animate-in slide-in-from-bottom duration-300"
-        style={{
-          paddingBottom: 'env(safe-area-inset-bottom)',
-          transform: dragY > 0 ? `translateY(${dragY}px)` : undefined,
-          transition: dragY === 0 ? 'transform 0.25s ease' : 'none'
-        }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
-        <div 
-          ref={sheetRef}
-          className="max-h-[85dvh] overflow-y-auto"
-        >
-          <div className="flex justify-center pt-2.5 pb-0 cursor-grab active:cursor-grabbing">
-            <div className="w-9 h-1 rounded-full bg-zinc-700" />
-          </div>
-          {children}
-        </div>
+      <div className="relative w-full max-w-sm bg-zinc-900 rounded-3xl shadow-2xl animate-in zoom-in-95 fade-in duration-300 max-h-[85dvh] overflow-y-auto">
+        {children}
       </div>
     </div>
   )
