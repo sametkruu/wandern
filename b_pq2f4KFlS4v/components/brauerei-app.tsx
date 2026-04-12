@@ -648,7 +648,7 @@ export default function BrauereiApp() {
                         e.stopPropagation()
                         openPrompt('Edit item:', item.text, (text) => editPackItem(item.id, text))
                       }}
-                      className="py-4 px-3 rounded-xl bg-zinc-700"
+                      className="py-3 px-4 rounded-xl bg-zinc-700"
                     >
                       <PenIcon size={18} color="#a1a1aa" />
                     </button>
@@ -657,7 +657,7 @@ export default function BrauereiApp() {
                         e.stopPropagation()
                         deletePackItem(item.id)
                       }}
-                      className="py-4 px-3 rounded-xl bg-red-500/20"
+                      className="py-3 px-4 rounded-xl bg-red-500/20"
                     >
                       <TrashIcon size={18} color="#f87171" />
                     </button>
@@ -1149,13 +1149,13 @@ function JournalTab({
                     <>
                       <button
                         onClick={() => onEditNote(Number(gid), entry)}
-                        className="py-4 px-3 rounded-xl bg-white/10 backdrop-blur-xl"
+                        className="py-3 px-4 rounded-xl bg-white/10 backdrop-blur-xl"
                       >
                         <PenIcon size={18} color="#d4d4d8" />
                       </button>
                       <button
                         onClick={() => onDeleteNote(Number(gid), entry.id)}
-                        className="py-4 px-3 rounded-xl bg-red-500/20"
+                        className="py-3 px-4 rounded-xl bg-red-500/20"
                       >
                         <TrashIcon size={18} color="#f87171" />
                       </button>
@@ -1203,13 +1203,13 @@ function JournalTab({
                   <>
                     <button
                       onClick={() => onEditNote(n.brewId, n.entry)}
-                      className="py-4 px-3 rounded-xl bg-white/10 backdrop-blur-xl"
+                      className="py-3 px-4 rounded-xl bg-white/10 backdrop-blur-xl"
                     >
                       <PenIcon size={18} color="#d4d4d8" />
                     </button>
                     <button
                       onClick={() => onDeleteNote(n.brewId, n.entry.id)}
-                      className="py-4 px-3 rounded-xl bg-red-500/20"
+                      className="py-3 px-4 rounded-xl bg-red-500/20"
                     >
                       <TrashIcon size={18} color="#f87171" />
                     </button>
