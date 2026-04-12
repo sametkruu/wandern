@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, createContext, useContext } from 'react'
 import { useVisited, useNotes, usePacking, type NoteEntry } from '@/hooks/use-store'
 import { BREWERIES, ROUTE_DAYS, GUIDE, BREWERY_KM, KM_MAP, VILLAGE_MESSAGES, DAY_TOASTS, STOPS_WAYPOINTS, type Brewery } from '@/lib/data'
 import { 
@@ -634,6 +634,7 @@ export default function BrauereiApp() {
             </button>
           </div>
           
+          <SwipeGroup>
           {packList.map((category, ci) => (
             <div key={ci} className="mb-7">
               <div className="flex items-center justify-between mb-2.5">
@@ -706,6 +707,7 @@ export default function BrauereiApp() {
               })}
             </div>
           ))}
+          </SwipeGroup>
           
           <button 
             onClick={() => openPrompt('Category name:', '', addCategory)}
@@ -1131,6 +1133,7 @@ function JournalTab({
         </div>
       </div>
 
+      <SwipeGroup>
       {journalSort === 'stop' ? (
         // Group by stop
         (() => {
@@ -1246,6 +1249,7 @@ function JournalTab({
           )
         })
       )}
+      </SwipeGroup>
     </div>
   )
 }
@@ -1366,6 +1370,15 @@ function Overlay({
   )
 }
 
+// SwipeGroup context – ensures only one SwipeableItem is open at a time
+type SwipeGroupEntry = { id: symbol; close: () => void }
+const SwipeGroupCtx = createContext<React.MutableRefObject<SwipeGroupEntry | null> | null>(null)
+
+function SwipeGroup({ children }: { children: React.ReactNode }) {
+  const activeRef = useRef<SwipeGroupEntry | null>(null)
+  return <SwipeGroupCtx.Provider value={activeRef}>{children}</SwipeGroupCtx.Provider>
+}
+
 // SwipeableItem Component – swipe left on mobile to reveal actions, hover on desktop
 function SwipeableItem({
   children,
@@ -1384,6 +1397,8 @@ function SwipeableItem({
   const [snapping, setSnapping] = useState(false)
   const startXRef = useRef(0)
   const startOffRef = useRef(0)
+  const idRef = useRef(Symbol())
+  const activeRef = useContext(SwipeGroupCtx)
 
   const snap = (to: number) => {
     setSnapping(true)
@@ -1398,6 +1413,11 @@ function SwipeableItem({
     <div
       className={cn('relative overflow-hidden group', className)}
       onTouchStart={e => {
+        // Close any other open item in the same group
+        if (activeRef?.current && activeRef.current.id !== idRef.current) {
+          activeRef.current.close()
+          activeRef.current = null
+        }
         setSnapping(false)
         startXRef.current = e.touches[0].clientX
         startOffRef.current = offset
@@ -1409,7 +1429,15 @@ function SwipeableItem({
         if (newOff < 0 || startOffRef.current < 0) setOffset(newOff)
       }}
       onTouchEnd={() => {
-        snap(offset < -(actionWidth / 2) ? -actionWidth : 0)
+        const target = offset < -(actionWidth / 2) ? -actionWidth : 0
+        snap(target)
+        if (activeRef) {
+          if (target < 0) {
+            activeRef.current = { id: idRef.current, close: () => snap(0) }
+          } else if (activeRef.current?.id === idRef.current) {
+            activeRef.current = null
+          }
+        }
       }}
     >
       {/* Mobile: action buttons slide in from the right edge of the screen */}
