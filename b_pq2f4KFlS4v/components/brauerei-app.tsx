@@ -467,15 +467,24 @@ export default function BrauereiApp() {
                               brewery={brewery}
                               isVisited={visited.has(brewery.id)}
                               isExpanded={expandedCards.has(brewery.id)}
-                              onToggleExpand={() => setExpandedCards(prev => {
-                                const next = new Set(prev)
-                                if (next.has(brewery.id)) {
-                                  next.delete(brewery.id)
-                                } else {
-                                  next.add(brewery.id)
+                              onToggleExpand={() => {
+                                const isCurrentlyExpanded = expandedCards.has(brewery.id)
+                                setExpandedCards(prev => {
+                                  const next = new Set(prev)
+                                  if (next.has(brewery.id)) {
+                                    next.delete(brewery.id)
+                                  } else {
+                                    next.add(brewery.id)
+                                  }
+                                  return next
+                                })
+                                if (!isCurrentlyExpanded) {
+                                  setTimeout(() => {
+                                    const el = document.getElementById(`brewery-${brewery.id}`)
+                                    if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' })
+                                  }, 50)
                                 }
-                                return next
-                              })}
+                              }}
                               onToggleVisit={() => handleToggleVisit(brewery)}
                               onOpenNote={() => handleOpenNoteSheet(brewery)}
                             />
@@ -818,7 +827,7 @@ function BreweryCard({
   const visitedColor = '#2a8d65'
 
   return (
-    <div className="relative z-10 mb-3 scroll-mt-[104px]">
+    <div id={`brewery-${brewery.id}`} className="relative z-10 mb-3 scroll-mt-[104px]">
       {/* Header */}
       <div 
         className="py-4 pl-14 pr-4 flex items-start gap-3 cursor-pointer relative"
@@ -842,7 +851,7 @@ function BreweryCard({
             {brewery.name}
           </h3>
           <p 
-            className="text-[11px] mt-1.5"
+            className="text-[11px] mt-0.5"
             style={{ color: isVisited ? visitedColor : 'var(--muted-foreground)' }}
           >
             {brewery.loc} · {isBrew ? 'Brewery' : 'Beergarden'} · {km?.c || '?'}
@@ -916,9 +925,9 @@ function BreweryCard({
               <span className="absolute -left-10 top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
                 <BeerIcon size={15} color="#8a8a92" />
               </span>
-              <span className="text-[13px] font-semibold text-zinc-500">Beer</span>
+              <span className="text-[13px] font-semibold text-zinc-300">Beer</span>
             </div>
-            <p className="text-[13px] text-zinc-500 leading-relaxed">{brewery.beer}</p>
+            <p className="text-[13px] text-zinc-300 leading-relaxed">{brewery.beer}</p>
           </div>
         )}
         
@@ -929,9 +938,9 @@ function BreweryCard({
               <span className="absolute -left-10 top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
                 <UtensilsIcon size={15} color="#8a8a92" />
               </span>
-              <span className="text-[13px] font-semibold text-zinc-500">Food</span>
+              <span className="text-[13px] font-semibold text-zinc-300">Food</span>
             </div>
-            <p className="text-[13px] text-zinc-500 leading-relaxed">{brewery.food}</p>
+            <p className="text-[13px] text-zinc-300 leading-relaxed">{brewery.food}</p>
           </div>
         )}
         
@@ -942,10 +951,10 @@ function BreweryCard({
               <span className="absolute -left-10 top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
                 <BookIcon size={15} color="#8a8a92" />
               </span>
-              <span className="text-[13px] font-semibold text-zinc-500">From the guide</span>
+              <span className="text-[13px] font-semibold text-zinc-300">From the guide</span>
             </div>
             <p 
-              className="text-[13px] text-zinc-500 leading-relaxed"
+              className="text-[13px] text-zinc-300 leading-relaxed"
               dangerouslySetInnerHTML={{ __html: guide }}
             />
           </div>
@@ -959,7 +968,7 @@ function BreweryCard({
             </span>
             <span className="text-[13px] font-semibold text-amber-500">Heads up</span>
           </div>
-          <p className="text-[13px] text-amber-500/45 leading-relaxed">{brewery.avoid}</p>
+          <p className="text-[13px] text-amber-500/70 leading-relaxed">{brewery.avoid}</p>
         </div>
         
         {/* Actions */}
