@@ -213,7 +213,7 @@ export default function BrauereiApp() {
         <div className="max-w-[640px] mx-auto px-6 py-1 flex items-center justify-between pointer-events-auto">
           <div>
             <h1 className="text-[26px] font-semibold text-zinc-50 tracking-tight">Fränkischer Wandern</h1>
-            <p className="text-[11px] text-zinc-500 font-medium tracking-wide mt-1">Der 13 Brauereien Weg</p>
+            <p className="text-[11px] text-zinc-500 font-medium tracking-wide">Der 13 Brauereien Weg</p>
           </div>
           {visited.size > 0 && (
             <div className="text-right shrink-0">
@@ -401,13 +401,6 @@ export default function BrauereiApp() {
                           )}
                         >
                           Day {day}
-                          <ChevronIcon 
-                            size={8} 
-                            className={cn(
-                              "transition-transform",
-                              !isExpanded && "-rotate-90"
-                            )}
-                          />
                         </h2>
                         <p 
                           className={cn(
@@ -437,6 +430,14 @@ export default function BrauereiApp() {
                           </p>
                         )}
                       </div>
+                      <ChevronIcon 
+                        size={14} 
+                        color="#71717a"
+                        className={cn(
+                          "transition-transform mt-1",
+                          !isExpanded && "-rotate-90"
+                        )}
+                      />
                     </div>
                   </div>
 
