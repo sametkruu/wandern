@@ -420,7 +420,7 @@ export default function BrauereiApp() {
                     <div className="overflow-hidden">
                       {/* Start waypoints (pass-through villages at beginning of day) */}
                       {STOPS_WAYPOINTS[day]?.start.map((wp, i) => (
-                        <div key={`start-${wp.n}-${i}`} className="relative z-10 py-5 pl-14">
+                        <div key={`start-${wp.n}-${i}`} className="relative z-10 py-2 pl-14">
                           <div 
                             className="absolute left-[27px] top-[28px] -translate-x-1/2 w-2 h-2 rounded-full z-10 transition-colors"
                             style={{ 
@@ -443,7 +443,7 @@ export default function BrauereiApp() {
                       {locationGroups.map((group, gi) => (
                         <div key={group.loc}>
                           {/* Location Header */}
-                          <div className="relative z-10 py-5 pl-14">
+                          <div className="relative z-10 py-2 pl-14">
                             <span className="absolute left-[27px] top-[18px] -translate-x-1/2 bg-[#09090b] p-0.5 rounded">
                               <FootIcon size={13} color="#3f3f46" />
                             </span>
@@ -485,7 +485,7 @@ export default function BrauereiApp() {
                       
                       {/* End waypoints (pass-through villages at end of day) */}
                       {STOPS_WAYPOINTS[day]?.end.map((wp, i) => (
-                        <div key={`end-${wp.n}-${i}`} className="relative z-10 py-5 pl-14">
+                        <div key={`end-${wp.n}-${i}`} className="relative z-10 py-2 pl-14">
                           <div 
                             className="absolute left-[27px] top-[28px] -translate-x-1/2 w-2 h-2 rounded-full z-10 transition-colors"
                             style={{ 
