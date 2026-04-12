@@ -196,6 +196,12 @@ export default function BrauereiApp() {
             <h1 className="text-[26px] font-semibold text-zinc-50 tracking-tight">Fränkischer Wandern</h1>
             <p className="text-[11px] text-zinc-500 font-medium tracking-wide mt-0.5">Der 13 Brauereien Weg</p>
           </div>
+          {visited.size > 0 && (
+            <div className="text-right shrink-0">
+              <div className="text-[26px] font-bold text-emerald-500 leading-none tracking-tight">{visited.size}</div>
+              <div className="text-[9px] text-zinc-600 font-semibold tracking-wider uppercase mt-0.5">of {BREWERIES.length}</div>
+            </div>
+          )}
         </div>
       </header>
 
@@ -206,6 +212,8 @@ export default function BrauereiApp() {
           <div className="flex flex-col gap-5 animate-in fade-in slide-in-from-right-10 duration-300">
             {ROUTE_DAYS.map(day => {
               const dayComplete = isDayComplete(day.day)
+              const dayBreweries = BREWERIES.filter(b => b.day === day.day)
+              const dayVisitedCount = dayBreweries.filter(b => visited.has(b.id)).length
               return (
                 <div 
                   key={day.day} 
@@ -240,6 +248,12 @@ export default function BrauereiApp() {
                       dayComplete ? "text-emerald-500/70" : "text-zinc-500"
                     )}>
                       {day.km}
+                      <span className={cn(
+                        "font-medium ml-2",
+                        dayComplete ? "text-emerald-500/70" : (dayVisitedCount > 0 ? "text-emerald-600" : "")
+                      )}>
+                        · {dayVisitedCount}/{dayBreweries.length}
+                      </span>
                     </p>
                     
                     {/* Timeline */}
@@ -565,7 +579,16 @@ export default function BrauereiApp() {
           </div>
           <div className="flex pointer-events-auto pr-3">
             <NavButton 
-              icon={<BackpackIcon size={22} color="#52525b" />}
+              icon={
+                <div className="relative">
+                  <BackpackIcon size={22} color="#52525b" />
+                  {totalPacked > 0 && packedCount < totalPacked && (
+                    <span className="absolute -top-1 -right-1.5 min-w-[14px] h-[14px] bg-amber-500 rounded-full text-[9px] font-bold text-zinc-900 flex items-center justify-center px-0.5 leading-none">
+                      {totalPacked - packedCount > 99 ? '99+' : totalPacked - packedCount}
+                    </span>
+                  )}
+                </div>
+              }
               label="Pack"
               active={false}
               onClick={() => setShowPackDrawer(true)}
@@ -1059,14 +1082,14 @@ function JournalTab({
         <span className="text-[13px] font-semibold text-zinc-500">
           {totalCount} entr{totalCount === 1 ? 'y' : 'ies'}
         </span>
-        <div className="flex gap-1">
+        <div className="flex bg-zinc-800/80 rounded-lg p-0.5 border border-zinc-700/50">
           <button
             onClick={() => setJournalSort('stop')}
             className={cn(
-              "px-3 py-1.5 rounded-lg border text-[11px] font-semibold",
+              "px-3 py-1 rounded-md text-[11px] font-semibold transition-all",
               journalSort === 'stop' 
-                ? "border-zinc-500 bg-zinc-800 text-zinc-300" 
-                : "border-zinc-700 bg-transparent text-zinc-600"
+                ? "bg-zinc-700 text-zinc-200 shadow-sm" 
+                : "text-zinc-500"
             )}
           >
             By Stop
@@ -1074,10 +1097,10 @@ function JournalTab({
           <button
             onClick={() => setJournalSort('type')}
             className={cn(
-              "px-3 py-1.5 rounded-lg border text-[11px] font-semibold",
+              "px-3 py-1 rounded-md text-[11px] font-semibold transition-all",
               journalSort === 'type' 
-                ? "border-zinc-500 bg-zinc-800 text-zinc-300" 
-                : "border-zinc-700 bg-transparent text-zinc-600"
+                ? "bg-zinc-700 text-zinc-200 shadow-sm" 
+                : "text-zinc-500"
             )}
           >
             By Type
