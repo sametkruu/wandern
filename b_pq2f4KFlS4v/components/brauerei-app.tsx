@@ -687,7 +687,7 @@ export default function BrauereiApp() {
         style={{ 
           background: 'linear-gradient(to bottom, transparent 0%, rgba(9,9,11,0.92) 30%, #09090b 55%, #09090b 100%)',
           paddingTop: '32px',
-          paddingBottom: 'var(--safe-area-bottom)'
+          paddingBottom: 'calc(var(--safe-area-bottom) + 8px)'
         }}
       >
         <div className="max-w-[640px] w-full mx-auto px-6 flex justify-between">
