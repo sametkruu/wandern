@@ -7,7 +7,7 @@ import {
   BeerIcon, WheatIcon, TreeIcon, FootIcon, PhoneIcon, GlobeIcon, PinIcon, 
   AlertIcon, UtensilsIcon, CheckIcon, ChatIcon, BookIcon, 
   ChevronIcon, ChevronRightIcon, PenIcon, TrashIcon, PlusIcon, CloseIcon,
-  CompassIcon, BackpackIcon
+  CompassIcon, BackpackIcon, NotebookPenIcon
 } from '@/components/icons'
 import { cn } from '@/lib/utils'
 
@@ -592,7 +592,7 @@ export default function BrauereiApp() {
               onClick={() => switchTab('stops')}
             />
             <NavButton 
-              icon={<ChatIcon size={22} color={activeTab === 'journal' ? '#fafafa' : '#52525b'} strokeWidth={activeTab === 'journal' ? 2.5 : 2} />}
+              icon={<NotebookPenIcon size={22} color={activeTab === 'journal' ? '#fafafa' : '#52525b'} strokeWidth={activeTab === 'journal' ? 2.5 : 2} />}
               label="Notes"
               active={activeTab === 'journal'}
               onClick={() => switchTab('journal')}
@@ -650,7 +650,7 @@ export default function BrauereiApp() {
                         e.stopPropagation()
                         openPrompt('Edit item:', item.text, (text) => editPackItem(item.id, text))
                       }}
-                      className="py-3 px-4 rounded-xl bg-zinc-700"
+                      className="flex items-center justify-center px-4 my-2 rounded-xl bg-zinc-700"
                     >
                       <PenIcon size={18} color="#a1a1aa" />
                     </button>
@@ -659,7 +659,7 @@ export default function BrauereiApp() {
                         e.stopPropagation()
                         deletePackItem(item.id)
                       }}
-                      className="py-3 px-4 rounded-xl bg-red-500/20"
+                      className="flex items-center justify-center px-4 my-2 rounded-xl bg-red-500/20"
                     >
                       <TrashIcon size={18} color="#f87171" />
                     </button>
@@ -1151,13 +1151,13 @@ function JournalTab({
                     <>
                       <button
                         onClick={() => onEditNote(Number(gid), entry)}
-                        className="py-3 px-4 rounded-xl bg-white/10 backdrop-blur-xl"
+                        className="flex items-center justify-center px-4 my-2 rounded-xl bg-white/10 backdrop-blur-xl"
                       >
                         <PenIcon size={18} color="#d4d4d8" />
                       </button>
                       <button
                         onClick={() => onDeleteNote(Number(gid), entry.id)}
-                        className="py-3 px-4 rounded-xl bg-red-500/20"
+                        className="flex items-center justify-center px-4 my-2 rounded-xl bg-red-500/20"
                       >
                         <TrashIcon size={18} color="#f87171" />
                       </button>
@@ -1205,13 +1205,13 @@ function JournalTab({
                   <>
                     <button
                       onClick={() => onEditNote(n.brewId, n.entry)}
-                      className="py-3 px-4 rounded-xl bg-white/10 backdrop-blur-xl"
+                      className="flex items-center justify-center px-4 my-2 rounded-xl bg-white/10 backdrop-blur-xl"
                     >
                       <PenIcon size={18} color="#d4d4d8" />
                     </button>
                     <button
                       onClick={() => onDeleteNote(n.brewId, n.entry.id)}
-                      className="py-3 px-4 rounded-xl bg-red-500/20"
+                      className="flex items-center justify-center px-4 my-2 rounded-xl bg-red-500/20"
                     >
                       <TrashIcon size={18} color="#f87171" />
                     </button>
@@ -1396,7 +1396,7 @@ function SwipeableItem({
     >
       {/* Mobile: action buttons slide in from the right edge of the screen */}
       <div
-        className="sm:hidden absolute inset-y-0 right-0 flex flex-row items-center gap-2 px-2"
+        className="sm:hidden absolute inset-y-0 right-0 flex flex-row items-stretch gap-2 px-2"
         style={{
           width: actionWidth,
           transform: `translateX(${(1 - progress) * 100}%)`,
@@ -1420,7 +1420,7 @@ function SwipeableItem({
             {children}
           </div>
           {/* Desktop only: action buttons slide in from right on hover */}
-          <div className="hidden sm:flex items-center gap-2 translate-x-3 opacity-0 pointer-events-none group-hover:translate-x-0 group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 ease-out px-2 shrink-0">
+          <div className="hidden sm:flex items-stretch gap-2 translate-x-3 opacity-0 pointer-events-none group-hover:translate-x-0 group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 ease-out px-2 shrink-0">
             {actions}
           </div>
         </div>
