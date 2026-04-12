@@ -403,9 +403,8 @@ export default function BrauereiApp() {
                           Day {day}
                           <ChevronIcon 
                             size={8} 
-                            color={dayComplete ? (isExpanded ? "#10b981" : "#047857") : (isExpanded ? "#fafafa" : "#71717a")}
                             className={cn(
-                              "transition-transform transition-colors",
+                              "transition-transform",
                               !isExpanded && "-rotate-90"
                             )}
                           />
