@@ -123,3 +123,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .tab-slide-from-right {
+    --tw-enter-translate-x: 55%;
+  }
+  .tab-slide-from-left {
+    --tw-enter-translate-x: -55%;
+  }
+}
