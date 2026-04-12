@@ -977,7 +977,7 @@ function BreweryCard({
               </span>
               <span className="text-[13px] font-semibold text-zinc-300">Beer</span>
             </div>
-            <p className="text-[13px] text-zinc-500 leading-relaxed">{brewery.beer}</p>
+            <p className="text-[13px] text-zinc-300 leading-relaxed">{brewery.beer}</p>
           </div>
         )}
         
@@ -990,7 +990,7 @@ function BreweryCard({
               </span>
               <span className="text-[13px] font-semibold text-zinc-300">Food</span>
             </div>
-            <p className="text-[13px] text-zinc-500 leading-relaxed">{brewery.food}</p>
+            <p className="text-[13px] text-zinc-300 leading-relaxed">{brewery.food}</p>
           </div>
         )}
         
@@ -1004,7 +1004,7 @@ function BreweryCard({
               <span className="text-[13px] font-semibold text-zinc-300">From the guide</span>
             </div>
             <p 
-              className="text-[13px] text-zinc-500 leading-relaxed"
+              className="text-[13px] text-zinc-300 leading-relaxed"
               dangerouslySetInnerHTML={{ __html: guide }}
             />
           </div>
