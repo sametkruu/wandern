@@ -334,7 +334,7 @@ export default function BrauereiApp() {
 
         {/* Stops Tab */}
         {activeTab === 'stops' && (
-          <div className="relative flex flex-col gap-2 animate-in fade-in slide-in-from-right-10 duration-300 pb-4">
+          <div className="relative flex flex-col gap-2 animate-in fade-in slide-in-from-right-10 duration-300 pb-4 -ml-2">
             {/* Dotted vertical timeline */}
             <div 
               className="absolute top-4 bottom-8 left-[15px] w-[3px] -translate-x-1/2 z-0"
