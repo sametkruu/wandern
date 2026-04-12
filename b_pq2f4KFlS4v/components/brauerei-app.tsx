@@ -442,7 +442,7 @@ export default function BrauereiApp() {
 
                   {/* Day Content */}
                   <div className={cn(
-                    "grid transition-all duration-300",
+                    "grid transition-all duration-500 ease-in-out",
                     isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
                   )}>
                     <div className="overflow-hidden">
@@ -920,7 +920,7 @@ function BreweryCard({
       
       {/* Body */}
       <div className={cn(
-        "overflow-hidden transition-all duration-300 pl-[28px]",
+        "overflow-hidden transition-all duration-500 ease-in-out pl-[28px]",
         isExpanded ? "max-h-[2000px] opacity-100 pb-6" : "max-h-0 opacity-0"
       )}>
         {/* Tags */}
