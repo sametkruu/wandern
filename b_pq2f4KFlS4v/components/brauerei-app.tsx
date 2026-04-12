@@ -210,7 +210,7 @@ export default function BrauereiApp() {
           paddingBottom: '55px'
         }}
       >
-        <div className="max-w-[640px] mx-auto px-6 py-1 flex items-center justify-between pointer-events-auto">
+        <div className="max-w-[640px] mx-auto px-6 pb-1 flex items-center justify-between pointer-events-auto">
           <div>
             <h1 className="text-[26px] font-semibold text-zinc-50 tracking-tight leading-[23px]">Fränkischer Wandern</h1>
             <p className="text-[11px] text-zinc-500 font-medium tracking-wide">Der 13 Brauereien Weg</p>
@@ -225,7 +225,7 @@ export default function BrauereiApp() {
       </header>
 
       {/* Main Content */}
-      <main className={cn("max-w-[640px] mx-auto pr-6 pt-[104px] pb-[100px]", activeTab === 'stops' ? "pl-0" : "pl-6")}>
+      <main className="max-w-[640px] mx-auto px-6 pt-[104px] pb-[100px]">
         {/* Route Tab */}
         {activeTab === 'route' && (
           <div className="flex flex-col gap-5 animate-in fade-in slide-in-from-right-10 duration-300">
@@ -921,7 +921,7 @@ function BreweryCard({
       
       {/* Body */}
       <div className={cn(
-        "overflow-hidden transition-all duration-500 ease-in-out pl-[28px]",
+        "overflow-hidden transition-all duration-500 ease-in-out pl-[40px]",
         isExpanded ? "max-h-[2000px] opacity-100 pb-6" : "max-h-0 opacity-0"
       )}>
         {/* Tags */}
@@ -1000,7 +1000,7 @@ function BreweryCard({
         {/* Warning */}
         <div className="mt-5">
           <div className="flex items-center gap-2 mb-2.5 relative min-h-[22px]">
-            <span className="absolute -left-[25px] -translate-x-1/2 top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
+            <span className="absolute -left-[13px] -translate-x-1/2 top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
               <AlertIcon size={15} color="#f59e0b" />
             </span>
             <span className="text-[13px] font-semibold text-amber-500">Heads up</span>
