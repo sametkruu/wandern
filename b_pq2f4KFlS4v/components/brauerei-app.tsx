@@ -68,12 +68,26 @@ export default function BrauereiApp() {
       const dayItems = BREWERIES.filter(b => b.day === brewery.day)
       const dayComplete = dayItems.every(b => newVisited.has(b.id))
       
-      // Close expanded card
+      // Find next unvisited brewery in the same day
+      const currentIndex = dayItems.findIndex(b => b.id === brewery.id)
+      const nextBrewery = dayItems.slice(currentIndex + 1).find(b => !newVisited.has(b.id))
+
+      // Close expanded card, then open next if any
       setExpandedCards(prev => {
         const next = new Set(prev)
         next.delete(brewery.id)
+        if (nextBrewery && !dayComplete) {
+          next.add(nextBrewery.id)
+        }
         return next
       })
+
+      if (nextBrewery && !dayComplete) {
+        setTimeout(() => {
+          const el = document.getElementById(`brewery-${nextBrewery.id}`)
+          if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' })
+        }, 350)
+      }
       
       if (villageComplete && !dayComplete) {
         const vm = VILLAGE_MESSAGES[brewery.loc]
@@ -191,7 +205,7 @@ export default function BrauereiApp() {
           paddingBottom: '55px'
         }}
       >
-        <div className="max-w-[640px] mx-auto px-4 py-3 flex items-center justify-between pointer-events-auto">
+        <div className="max-w-[640px] mx-auto px-4 py-1 flex items-center justify-between pointer-events-auto">
           <div>
             <h1 className="text-[26px] font-semibold text-zinc-50 tracking-tight">Fränkischer Wandern</h1>
             <p className="text-[11px] text-zinc-500 font-medium tracking-wide mt-0.5">Der 13 Brauereien Weg</p>
@@ -404,7 +418,7 @@ export default function BrauereiApp() {
                             "transition-colors",
                             dayComplete 
                               ? (isExpanded ? "text-emerald-500/70" : "text-emerald-700/70")
-                              : "text-zinc-500"
+                              : "text-zinc-600"
                           )}>{dayData.title}</span>
                         </p>
                         
@@ -436,20 +450,20 @@ export default function BrauereiApp() {
                       {STOPS_WAYPOINTS[day]?.start.map((wp, i) => (
                         <div key={`start-${wp.n}-${i}`} className="relative z-10 py-2 pl-14">
                           <div 
-                            className="absolute left-[27px] top-[28px] -translate-x-1/2 w-2 h-2 rounded-full z-10 transition-colors"
+                            className="absolute left-[27px] top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full z-10 transition-colors"
                             style={{ 
                               background: '#3f3f46',
                               boxShadow: '0 0 0 3px #09090b' 
                             }}
                           />
-                          <span className="text-[10px] font-medium text-zinc-500 mr-2">
+                          <span className="text-[10px] font-medium text-zinc-600 mr-2">
                             {wp.ck}
                           </span>
-                          <span className="text-[11px] font-semibold text-zinc-500 tracking-wider uppercase">
+                          <span className="text-[11px] font-semibold text-zinc-600 tracking-wider uppercase">
                             {wp.n}
                           </span>
-                          <span className="text-[10px] font-medium text-zinc-500 ml-2">
-                            · {wp.rk}
+                          <span className="text-[10px] font-medium text-zinc-600 ml-2">
+                            · Day: {wp.rk}
                           </span>
                         </div>
                       ))}
@@ -458,18 +472,19 @@ export default function BrauereiApp() {
                         <div key={group.loc}>
                           {/* Location Header */}
                           <div className="relative z-10 py-2 pl-14">
-                            <span className="absolute left-[27px] top-[18px] -translate-x-1/2 bg-[#09090b] p-0.5 rounded">
-                              <FootIcon size={13} color="#3f3f46" />
-                            </span>
-                            <span className="text-[10px] font-medium text-zinc-500 mr-2">
+                            <div 
+                              className="absolute left-[27px] top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full z-10"
+                              style={{ background: '#3f3f46', boxShadow: '0 0 0 3px #09090b' }}
+                            />
+                            <span className="text-[10px] font-medium text-zinc-600 mr-2">
                               {KM_MAP[group.loc]?.c ? `km ${KM_MAP[group.loc].c}` : ''}
                             </span>
-                            <span className="text-[11px] font-semibold text-zinc-500 tracking-wider uppercase">
+                            <span className="text-[11px] font-semibold text-zinc-600 tracking-wider uppercase">
                               {group.loc}
                             </span>
                             {day > 1 && KM_MAP[group.loc]?.r && (
-                              <span className="text-[10px] font-medium text-zinc-500 ml-2">
-                                · km {KM_MAP[group.loc].r}
+                              <span className="text-[10px] font-medium text-zinc-600 ml-2">
+                                · Day: {KM_MAP[group.loc].r}
                               </span>
                             )}
                           </div>
@@ -510,20 +525,20 @@ export default function BrauereiApp() {
                       {STOPS_WAYPOINTS[day]?.end.map((wp, i) => (
                         <div key={`end-${wp.n}-${i}`} className="relative z-10 py-2 pl-14">
                           <div 
-                            className="absolute left-[27px] top-[28px] -translate-x-1/2 w-2 h-2 rounded-full z-10 transition-colors"
+                            className="absolute left-[27px] top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full z-10 transition-colors"
                             style={{ 
                               background: '#3f3f46',
                               boxShadow: '0 0 0 3px #09090b' 
                             }}
                           />
-                          <span className="text-[10px] font-medium text-zinc-500 mr-2">
+                          <span className="text-[10px] font-medium text-zinc-600 mr-2">
                             {wp.ck}
                           </span>
-                          <span className="text-[11px] font-semibold text-zinc-500 tracking-wider uppercase">
+                          <span className="text-[11px] font-semibold text-zinc-600 tracking-wider uppercase">
                             {wp.n}
                           </span>
-                          <span className="text-[10px] font-medium text-zinc-500 ml-2">
-                            · {wp.rk}
+                          <span className="text-[10px] font-medium text-zinc-600 ml-2">
+                            · Day: {wp.rk}
                           </span>
                         </div>
                       ))}
@@ -579,16 +594,7 @@ export default function BrauereiApp() {
           </div>
           <div className="flex pointer-events-auto pr-3">
             <NavButton 
-              icon={
-                <div className="relative">
-                  <BackpackIcon size={22} color="#52525b" />
-                  {totalPacked > 0 && packedCount < totalPacked && (
-                    <span className="absolute -top-1 -right-1.5 min-w-[14px] h-[14px] bg-amber-500 rounded-full text-[9px] font-bold text-zinc-900 flex items-center justify-center px-0.5 leading-none">
-                      {totalPacked - packedCount > 99 ? '99+' : totalPacked - packedCount}
-                    </span>
-                  )}
-                </div>
-              }
+              icon={<BackpackIcon size={22} color="#52525b" />}
               label="Pack"
               active={false}
               onClick={() => setShowPackDrawer(true)}
@@ -846,7 +852,7 @@ function BreweryCard({
   const km = BREWERY_KM[brewery.id]
   const guide = GUIDE[brewery.id]
   
-  const activeColor = isVisited ? '#2a8d65' : (isExpanded ? '#fafafa' : '#8a8a92')
+  const activeColor = isVisited ? '#2a8d65' : (isExpanded ? '#fafafa' : '#52525b')
   const visitedColor = '#2a8d65'
 
   return (
@@ -858,11 +864,10 @@ function BreweryCard({
       >
         <span 
           className="absolute left-[27px] top-8 -translate-x-1/2 -translate-y-1/2 bg-[#09090b] p-1 rounded z-10"
-          style={{ transform: 'translate(-50%, -50%) scale(1.6)' }}
         >
           {isBrew 
-            ? <WheatIcon size={15} color={isVisited ? visitedColor : activeColor} strokeWidth={2.5} />
-            : <TreeIcon size={15} color={isVisited ? visitedColor : activeColor} strokeWidth={2.5} />
+            ? <WheatIcon size={22} color={isVisited ? visitedColor : activeColor} strokeWidth={2.5} />
+            : <TreeIcon size={22} color={isVisited ? visitedColor : activeColor} strokeWidth={2.5} />
           }
         </span>
         
@@ -874,8 +879,8 @@ function BreweryCard({
             {brewery.name}
           </h3>
           <p 
-            className="text-[11px] mt-0.5"
-            style={{ color: isVisited ? visitedColor : 'var(--muted-foreground)' }}
+            className="text-[11px] -mt-0.5"
+            style={{ color: isVisited ? visitedColor : (isExpanded ? 'var(--muted-foreground)' : '#52525b') }}
           >
             {brewery.loc} · {isBrew ? 'Brewery' : 'Beergarden'} · {km?.c || '?'}
             {brewery.food && (
