@@ -1328,24 +1328,26 @@ function Overlay({
         className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={onClose}
       />
-      <div 
-        ref={sheetRef}
-        className="relative bg-zinc-900 rounded-t-3xl max-h-[85dvh] overflow-y-auto animate-in slide-in-from-bottom duration-300"
-        style={{
-          transform: dragY > 0 ? `translateY(${dragY}px)` : undefined,
-          transition: dragY === 0 ? 'transform 0.25s ease' : 'none'
-        }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
-        <div className="flex justify-center pt-2.5 pb-0 cursor-grab active:cursor-grabbing">
-          <div className="w-9 h-1 rounded-full bg-zinc-700" />
+      <div className="relative shrink-0">
+        <div 
+          ref={sheetRef}
+          className="relative bg-zinc-900 rounded-t-3xl max-h-[85dvh] overflow-y-auto animate-in slide-in-from-bottom duration-300"
+          style={{
+            transform: dragY > 0 ? `translateY(${dragY}px)` : undefined,
+            transition: dragY === 0 ? 'transform 0.25s ease' : 'none'
+          }}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div className="flex justify-center pt-2.5 pb-0 cursor-grab active:cursor-grabbing">
+            <div className="w-9 h-1 rounded-full bg-zinc-700" />
+          </div>
+          {children}
         </div>
-        {children}
+        {/* Extends sheet bg seamlessly behind the native keyboard */}
+        <div className="absolute left-0 right-0 top-full bg-zinc-900 h-dvh pointer-events-none" />
       </div>
-      {/* Extends sheet bg seamlessly behind the native keyboard */}
-      <div className="relative bg-zinc-900 shrink-0 h-dvh pointer-events-none" />
     </div>
   )
 }
