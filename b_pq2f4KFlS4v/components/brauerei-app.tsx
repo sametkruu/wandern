@@ -383,7 +383,8 @@ export default function BrauereiApp() {
                     {/* Rectangle marker for day headers */}
                     <div 
                       className={cn(
-                        "absolute left-[15px] top-6 -translate-x-1/2 w-1.5 h-14 rounded-sm z-10 transition-colors",
+                        "absolute left-[15px] top-6 -translate-x-1/2 w-1.5 rounded-sm z-10 transition-all",
+                        isExpanded ? "h-14" : "h-[72px]",
                         dayComplete 
                           ? (isExpanded ? "bg-emerald-500" : "bg-emerald-700")
                           : (isExpanded ? "bg-zinc-50" : "bg-zinc-600")
