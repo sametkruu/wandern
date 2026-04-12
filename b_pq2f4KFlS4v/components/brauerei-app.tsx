@@ -408,12 +408,14 @@ export default function BrauereiApp() {
                           )}
                         >
                           Day {day}
-                          {dayComplete && (
-                            <CheckCircleIcon 
-                              size={20} 
-                              color={isExpanded ? "#12d492" : "#2a8d65"} 
-                            />
-                          )}
+                          <ChevronIcon 
+                            size={32} 
+                            color={isExpanded ? "#fafafa" : "#71717a"}
+                            className={cn(
+                              "transition-transform transition-colors",
+                              !isExpanded && "-rotate-90"
+                            )}
+                          />
                         </h2>
                         <p 
                           className={cn(
@@ -435,19 +437,14 @@ export default function BrauereiApp() {
                         
                         {/* Collapsed location preview */}
                         {!isExpanded && (
-                          <p className="text-[11px] text-zinc-600 mt-1 font-medium leading-relaxed">
+                          <p className={cn(
+                            "text-[11px] mt-1 font-medium leading-relaxed transition-colors",
+                            dayComplete ? "text-emerald-700" : "text-zinc-600"
+                          )}>
                             {locationGroups.map(g => g.loc).join(' · ')}
                           </p>
                         )}
                       </div>
-                      <ChevronIcon 
-                        size={20} 
-                        color="#71717a"
-                        className={cn(
-                          "transition-transform mt-1",
-                          !isExpanded && "-rotate-90"
-                        )}
-                      />
                     </div>
                   </div>
 
