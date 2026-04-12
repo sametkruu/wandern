@@ -225,7 +225,7 @@ export default function BrauereiApp() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-[640px] mx-auto px-6 pt-[104px] pb-[100px]">
+      <main className={cn("max-w-[640px] mx-auto pr-6 pt-[104px] pb-[100px]", activeTab === 'stops' ? "pl-0" : "pl-6")}>
         {/* Route Tab */}
         {activeTab === 'route' && (
           <div className="flex flex-col gap-5 animate-in fade-in slide-in-from-right-10 duration-300">
@@ -920,7 +920,7 @@ function BreweryCard({
       
       {/* Body */}
       <div className={cn(
-        "overflow-hidden transition-all duration-300 pl-[28px]",
+        "overflow-hidden transition-all duration-300 pl-[40px]",
         isExpanded ? "max-h-[2000px] opacity-100 pb-6" : "max-h-0 opacity-0"
       )}>
         {/* Tags */}
@@ -958,7 +958,7 @@ function BreweryCard({
         {brewery.beer && (
           <div className="mt-5">
             <div className="flex items-center gap-2 mb-2.5 relative min-h-[22px]">
-              <span className="absolute -left-[13px] top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
+              <span className="absolute -left-[25px] -translate-x-1/2 top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
                 <BeerIcon size={15} color="#8a8a92" />
               </span>
               <span className="text-[13px] font-semibold text-zinc-300">Beer</span>
@@ -971,7 +971,7 @@ function BreweryCard({
         {brewery.food && (
           <div className="mt-5">
             <div className="flex items-center gap-2 mb-2.5 relative min-h-[22px]">
-              <span className="absolute -left-[13px] top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
+              <span className="absolute -left-[25px] -translate-x-1/2 top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
                 <UtensilsIcon size={15} color="#8a8a92" />
               </span>
               <span className="text-[13px] font-semibold text-zinc-300">Food</span>
@@ -984,7 +984,7 @@ function BreweryCard({
         {guide && (
           <div className="mt-5">
             <div className="flex items-center gap-2 mb-2.5 relative min-h-[22px]">
-              <span className="absolute -left-[13px] top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
+              <span className="absolute -left-[25px] -translate-x-1/2 top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
                 <BookIcon size={15} color="#8a8a92" />
               </span>
               <span className="text-[13px] font-semibold text-zinc-300">From the guide</span>
@@ -999,7 +999,7 @@ function BreweryCard({
         {/* Warning */}
         <div className="mt-5">
           <div className="flex items-center gap-2 mb-2.5 relative min-h-[22px]">
-            <span className="absolute -left-[13px] top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
+            <span className="absolute -left-[25px] -translate-x-1/2 top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
               <AlertIcon size={15} color="#f59e0b" />
             </span>
             <span className="text-[13px] font-semibold text-amber-500">Heads up</span>
