@@ -1349,7 +1349,7 @@ function Overlay({
 function SwipeableItem({
   children,
   actions,
-  actionWidth = 110,
+  actionWidth = 120,
   bgColor = '#18181b',
   className
 }: {
@@ -1369,37 +1369,47 @@ function SwipeableItem({
     setOffset(to)
   }
 
+  // 0 = closed, 1 = fully open
+  const progress = Math.min(1, Math.abs(offset) / actionWidth)
+  const isOpen = offset <= -actionWidth
+
   return (
-    <div className={cn('relative overflow-hidden group', className)}>
-      {/* Mobile: action buttons sit behind content, revealed by swiping left */}
+    <div
+      className={cn('relative overflow-hidden group', className)}
+      onTouchStart={e => {
+        setSnapping(false)
+        startXRef.current = e.touches[0].clientX
+        startOffRef.current = offset
+      }}
+      onTouchMove={e => {
+        const dx = e.touches[0].clientX - startXRef.current
+        const newOff = Math.max(-actionWidth, Math.min(0, startOffRef.current + dx))
+        // Only slide on leftward swipe or when already open
+        if (newOff < 0 || startOffRef.current < 0) setOffset(newOff)
+      }}
+      onTouchEnd={() => {
+        snap(offset < -(actionWidth / 2) ? -actionWidth : 0)
+      }}
+    >
+      {/* Mobile: action buttons slide in from the right edge of the screen */}
       <div
-        className="sm:hidden absolute inset-y-0 right-0 flex flex-row flex-nowrap gap-1 p-1 [&>button]:flex-1 [&>button]:flex [&>button]:items-center [&>button]:justify-center"
-        style={{ width: actionWidth }}
+        className="sm:hidden absolute inset-y-0 right-0 flex flex-row items-center gap-2 px-2"
+        style={{
+          width: actionWidth,
+          transform: `translateX(${(1 - progress) * 100}%)`,
+          transition: snapping ? 'transform 0.2s ease' : 'none',
+          pointerEvents: isOpen ? 'auto' : 'none',
+        }}
       >
         {actions}
       </div>
 
-      {/* Slideable content */}
+      {/* Content stays in place; fades as actions are revealed */}
       <div
-        className="rounded-r-xl"
         style={{
           background: bgColor,
-          transform: `translateX(${offset}px)`,
-          transition: snapping ? 'transform 0.2s ease' : 'none'
-        }}
-        onTouchStart={e => {
-          setSnapping(false)
-          startXRef.current = e.touches[0].clientX
-          startOffRef.current = offset
-        }}
-        onTouchMove={e => {
-          const dx = e.touches[0].clientX - startXRef.current
-          const newOff = Math.max(-actionWidth, Math.min(0, startOffRef.current + dx))
-          // Only slide on leftward swipe
-          if (newOff < 0 || startOffRef.current < 0) setOffset(newOff)
-        }}
-        onTouchEnd={() => {
-          snap(offset < -(actionWidth / 2) ? -actionWidth : 0)
+          opacity: 1 - progress * 0.65,
+          transition: snapping ? 'opacity 0.2s ease' : 'none',
         }}
       >
         <div className="flex items-stretch">
