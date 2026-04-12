@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Brauereien Weg',
+    title: 'Fränkischer Wandern',
   },
   icons: {
     apple: '/apple-icon.png',
