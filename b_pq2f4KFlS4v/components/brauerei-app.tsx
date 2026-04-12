@@ -261,7 +261,7 @@ export default function BrauereiApp() {
                       )}>{day.date}</span>
                     </p>
                     <h2 className={cn(
-                      "text-2xl font-bold tracking-tight",
+                      "text-3xl font-bold tracking-tight",
                       dayComplete ? "text-emerald-500" : "text-zinc-50"
                     )}>
                       {day.title}
@@ -580,10 +580,8 @@ export default function BrauereiApp() {
           <div className={cn("flex flex-col animate-in fade-in duration-300", slideDirection === 'right' ? "tab-slide-from-right" : "tab-slide-from-left")}>
             <div className="mb-5">
               <h2 className="text-2xl font-bold text-zinc-50 flex items-center gap-2 tracking-tight">
-                <BackpackIcon size={20} color="#fafafa" />
-                Packing List
+                {packedCount} of {totalPacked} packed
               </h2>
-              <p className="text-xs text-zinc-500 mt-1">{packedCount} of {totalPacked} packed</p>
             </div>
 
             <SwipeGroup>
