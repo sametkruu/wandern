@@ -50,7 +50,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" style={{ backgroundColor: '#09090b' }}>
       <body className="font-sans antialiased overflow-x-hidden" style={{ scrollbarWidth: 'none' }}>
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}

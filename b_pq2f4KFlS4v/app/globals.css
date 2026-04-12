@@ -132,3 +132,16 @@
     --tw-enter-translate-x: -55%;
   }
 }
+
+/* Safe-area padding: only apply when running as installed PWA (standalone).
+   In browser mode Safari already positions fixed elements above its toolbar,
+   so adding env(safe-area-inset-bottom) on top of that pushes the nav too high. */
+:root {
+  --safe-area-bottom: 0px;
+}
+
+@media (display-mode: standalone) {
+  :root {
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}

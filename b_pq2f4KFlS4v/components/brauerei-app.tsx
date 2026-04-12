@@ -231,7 +231,7 @@ export default function BrauereiApp() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-[640px] mx-auto px-6" style={{ paddingTop: 'calc(104px + env(safe-area-inset-top))', paddingBottom: 'calc(100px + env(safe-area-inset-bottom))' }}>
+      <main className="max-w-[640px] mx-auto px-6" style={{ paddingTop: 'calc(104px + env(safe-area-inset-top))', paddingBottom: 'calc(120px + var(--safe-area-bottom))' }}>
         {/* Route Tab */}
         {activeTab === 'route' && (
           <div className={cn("flex flex-col gap-5 animate-in fade-in duration-300", slideDirection === 'right' ? "tab-slide-from-right" : "tab-slide-from-left")}>
@@ -676,9 +676,9 @@ export default function BrauereiApp() {
       <nav 
         className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none"
         style={{ 
-          background: 'linear-gradient(to bottom, transparent 0%, rgba(9,9,11,0.8) 20%, #09090b 45%, #09090b 100%)',
-          paddingTop: '38px',
-          paddingBottom: 'env(safe-area-inset-bottom)'
+          background: 'linear-gradient(to bottom, transparent 0%, rgba(9,9,11,0.92) 30%, #09090b 55%, #09090b 100%)',
+          paddingTop: '32px',
+          paddingBottom: 'var(--safe-area-bottom)'
         }}
       >
         <div className="max-w-[640px] w-full mx-auto px-6 flex justify-between">
