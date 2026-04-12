@@ -1,7 +1,7 @@
 import {
   Beer, Wheat, Trees, Footprints, Clock, Phone, Globe, MapPin,
   TriangleAlert, Utensils, Check, MessageSquare, Book, ChevronDown,
-  ChevronRight, Pen, Trash2, Plus, X, Compass, Backpack, NotebookPen
+  ChevronRight, Pen, Trash2, Plus, Minus, X, Compass, Backpack, NotebookPen
 } from 'lucide-react'
 
 export const BeerIcon = Beer
@@ -22,6 +22,7 @@ export const ChevronRightIcon = ChevronRight
 export const PenIcon = Pen
 export const TrashIcon = Trash2
 export const PlusIcon = Plus
+export const MinusIcon = Minus
 export const CloseIcon = X
 export const CompassIcon = Compass
 export const BackpackIcon = Backpack
