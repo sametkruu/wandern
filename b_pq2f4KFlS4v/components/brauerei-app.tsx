@@ -92,8 +92,11 @@ export default function BrauereiApp() {
       if (nextBrewery && !dayComplete) {
         setTimeout(() => {
           const el = document.getElementById(`brewery-${nextBrewery.id}`)
-          if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' })
-        }, 350)
+          if (el) {
+            const top = el.getBoundingClientRect().top + window.scrollY - 40
+            window.scrollTo({ top, behavior: 'smooth' })
+          }
+        }, 520)
       }
       
       if (villageComplete && !dayComplete) {
@@ -875,7 +878,7 @@ function BreweryCard({
   const visitedColor = '#2a8d65'
 
   return (
-    <div id={`brewery-${brewery.id}`} className="relative z-10 mb-3 scroll-mt-[104px]">
+    <div id={`brewery-${brewery.id}`} className="relative z-10 mb-3 scroll-mt-[40px]">
       {/* Header */}
       <div 
         className="py-4 pl-[40px] flex items-start gap-3 cursor-pointer relative"
