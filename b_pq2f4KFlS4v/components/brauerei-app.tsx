@@ -995,7 +995,7 @@ function BreweryCard({
               <span className="text-[13px] font-semibold text-zinc-300">From the guide</span>
             </div>
             <p 
-              className="text-[13px] text-zinc-300 leading-relaxed"
+              className="text-[13px] text-zinc-500 leading-relaxed"
               dangerouslySetInnerHTML={{ __html: guide }}
             />
           </div>
