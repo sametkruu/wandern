@@ -1402,7 +1402,7 @@ function SwipeableItem({
       <div
         style={{
           background: bgColor,
-          opacity: 1 - progress * 0.85,
+          opacity: 1 - progress * 0.4,
           transition: snapping ? 'opacity 0.2s ease' : 'none',
         }}
       >
