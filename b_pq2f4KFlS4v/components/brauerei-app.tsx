@@ -650,7 +650,7 @@ export default function BrauereiApp() {
                         e.stopPropagation()
                         openPrompt('Edit item:', item.text, (text) => editPackItem(item.id, text))
                       }}
-                      className="flex items-center justify-center px-4 my-2 rounded-xl bg-zinc-700"
+                      className="flex items-center justify-center px-4 rounded-xl bg-zinc-700"
                     >
                       <PenIcon size={18} color="#a1a1aa" />
                     </button>
@@ -659,7 +659,7 @@ export default function BrauereiApp() {
                         e.stopPropagation()
                         deletePackItem(item.id)
                       }}
-                      className="flex items-center justify-center px-4 my-2 rounded-xl bg-red-500/20"
+                      className="flex items-center justify-center px-4 rounded-xl bg-red-500/20"
                     >
                       <TrashIcon size={18} color="#f87171" />
                     </button>
@@ -1344,6 +1344,8 @@ function Overlay({
         </div>
         {children}
       </div>
+      {/* Extends sheet bg seamlessly behind the native keyboard */}
+      <div className="relative bg-zinc-900 shrink-0 h-dvh pointer-events-none" />
     </div>
   )
 }
@@ -1399,8 +1401,9 @@ function SwipeableItem({
         className="sm:hidden absolute inset-y-0 right-0 flex flex-row items-stretch gap-2 px-2"
         style={{
           width: actionWidth,
-          transform: `translateX(${(1 - progress) * 100}%)`,
-          transition: snapping ? 'transform 0.2s ease' : 'none',
+          transform: `translateX(calc(${(1 - progress) * 100}% - ${progress * 4}px))`,
+          opacity: progress,
+          transition: snapping ? 'transform 0.2s ease, opacity 0.2s ease' : 'none',
           pointerEvents: isOpen ? 'auto' : 'none',
         }}
       >
