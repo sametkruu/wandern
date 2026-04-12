@@ -212,7 +212,7 @@ export default function BrauereiApp() {
       >
         <div className="max-w-[640px] mx-auto px-6 py-1 flex items-center justify-between pointer-events-auto">
           <div>
-            <h1 className="text-[26px] font-semibold text-zinc-50 tracking-tight">Fränkischer Wandern</h1>
+            <h1 className="text-[26px] font-semibold text-zinc-50 tracking-tight leading-[23px]">Fränkischer Wandern</h1>
             <p className="text-[11px] text-zinc-500 font-medium tracking-wide">Der 13 Brauereien Weg</p>
           </div>
           {visited.size > 0 && (
