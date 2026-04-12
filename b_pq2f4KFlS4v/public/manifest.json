@@ -1,0 +1,21 @@
+{
+  "name": "Fränkischer Wandern",
+  "short_name": "Wandern",
+  "description": "Your hiking companion for the 13 Breweries Trail in Franconia, Germany.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    },
+    {
+      "src": "/icon-light-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    }
+  ]
+}

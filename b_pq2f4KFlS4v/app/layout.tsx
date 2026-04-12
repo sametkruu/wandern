@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: 'Fränkischer Wandern | Der 13 Brauereien Weg',
   description: 'Your hiking companion for the 13 Breweries Trail in Franconia, Germany. Track stops, take notes, and manage your packing list.',
   generator: 'v0.app',
+  manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
