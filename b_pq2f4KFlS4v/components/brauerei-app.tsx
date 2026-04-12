@@ -651,7 +651,7 @@ export default function BrauereiApp() {
                         e.stopPropagation()
                         openPrompt('Edit item:', item.text, (text) => editPackItem(item.id, text))
                       }}
-                      className="p-2.5 rounded-xl bg-zinc-700"
+                      className="p-2 rounded-xl bg-zinc-700"
                     >
                       <PenIcon size={18} color="#a1a1aa" />
                     </button>
@@ -660,7 +660,7 @@ export default function BrauereiApp() {
                         e.stopPropagation()
                         deletePackItem(item.id)
                       }}
-                      className="p-2.5 rounded-xl bg-red-500/20"
+                      className="p-2 rounded-xl bg-red-500/20"
                     >
                       <TrashIcon size={18} color="#f87171" />
                     </button>
@@ -924,7 +924,7 @@ function BreweryCard({
       
       {/* Body */}
       <div className={cn(
-        "overflow-hidden transition-all duration-300 pl-[52px]",
+        "overflow-hidden transition-all duration-300 pl-[40px]",
         isExpanded ? "max-h-[2000px] opacity-100 pb-6" : "max-h-0 opacity-0"
       )}>
         {/* Tags */}
@@ -962,7 +962,7 @@ function BreweryCard({
         {brewery.beer && (
           <div className="mt-5">
             <div className="flex items-center gap-2 mb-2.5 relative min-h-[22px]">
-              <span className="absolute -left-10 top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
+              <span className="absolute -left-[13px] top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
                 <BeerIcon size={15} color="#8a8a92" />
               </span>
               <span className="text-[13px] font-semibold text-zinc-300">Beer</span>
@@ -975,7 +975,7 @@ function BreweryCard({
         {brewery.food && (
           <div className="mt-5">
             <div className="flex items-center gap-2 mb-2.5 relative min-h-[22px]">
-              <span className="absolute -left-10 top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
+              <span className="absolute -left-[13px] top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
                 <UtensilsIcon size={15} color="#8a8a92" />
               </span>
               <span className="text-[13px] font-semibold text-zinc-300">Food</span>
@@ -988,7 +988,7 @@ function BreweryCard({
         {guide && (
           <div className="mt-5">
             <div className="flex items-center gap-2 mb-2.5 relative min-h-[22px]">
-              <span className="absolute -left-10 top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
+              <span className="absolute -left-[13px] top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
                 <BookIcon size={15} color="#8a8a92" />
               </span>
               <span className="text-[13px] font-semibold text-zinc-300">From the guide</span>
@@ -1003,7 +1003,7 @@ function BreweryCard({
         {/* Warning */}
         <div className="mt-5">
           <div className="flex items-center gap-2 mb-2.5 relative min-h-[22px]">
-            <span className="absolute -left-10 top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
+            <span className="absolute -left-[13px] top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
               <AlertIcon size={15} color="#f59e0b" />
             </span>
             <span className="text-[13px] font-semibold text-amber-500">Heads up</span>
@@ -1152,13 +1152,13 @@ function JournalTab({
                     <>
                       <button
                         onClick={() => onEditNote(Number(gid), entry)}
-                        className="p-2.5 rounded-xl bg-white/10 backdrop-blur-xl"
+                        className="p-2 rounded-xl bg-white/10 backdrop-blur-xl"
                       >
                         <PenIcon size={18} color="#d4d4d8" />
                       </button>
                       <button
                         onClick={() => onDeleteNote(Number(gid), entry.id)}
-                        className="p-2.5 rounded-xl bg-red-500/20"
+                        className="p-2 rounded-xl bg-red-500/20"
                       >
                         <TrashIcon size={18} color="#f87171" />
                       </button>
@@ -1206,13 +1206,13 @@ function JournalTab({
                   <>
                     <button
                       onClick={() => onEditNote(n.brewId, n.entry)}
-                      className="p-2.5 rounded-xl bg-white/10 backdrop-blur-xl"
+                      className="p-2 rounded-xl bg-white/10 backdrop-blur-xl"
                     >
                       <PenIcon size={18} color="#d4d4d8" />
                     </button>
                     <button
                       onClick={() => onDeleteNote(n.brewId, n.entry.id)}
-                      className="p-2.5 rounded-xl bg-red-500/20"
+                      className="p-2 rounded-xl bg-red-500/20"
                     >
                       <TrashIcon size={18} color="#f87171" />
                     </button>
@@ -1353,7 +1353,7 @@ function Overlay({
 function SwipeableItem({
   children,
   actions,
-  actionWidth = 120,
+  actionWidth = 90,
   bgColor = '#18181b',
   className
 }: {
@@ -1377,7 +1377,7 @@ function SwipeableItem({
     <div className={cn('relative overflow-hidden group', className)}>
       {/* Mobile: action buttons sit behind content, revealed by swiping left */}
       <div
-        className="sm:hidden absolute inset-y-0 right-0 flex flex-col gap-1 p-1 [&>button]:flex-1 [&>button]:flex [&>button]:items-center [&>button]:justify-center"
+        className="sm:hidden absolute inset-y-0 right-0 flex flex-row gap-1 p-1 [&>button]:flex-1 [&>button]:flex [&>button]:items-center [&>button]:justify-center"
         style={{ width: actionWidth }}
       >
         {actions}
