@@ -1413,6 +1413,7 @@ function SwipeableItem({
           opacity: progress,
           transition: snapping ? 'transform 0.2s ease, opacity 0.2s ease' : 'none',
           pointerEvents: isOpen ? 'auto' : 'none',
+          zIndex: 1,
         }}
       >
         {actions}
@@ -1422,7 +1423,7 @@ function SwipeableItem({
       <div
         style={{
           background: bgColor,
-          opacity: 1 - progress * 0.65,
+          opacity: 1 - progress * 0.85,
           transition: snapping ? 'opacity 0.2s ease' : 'none',
         }}
       >
