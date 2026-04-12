@@ -210,6 +210,7 @@ export default function BrauereiApp() {
         )}
         style={{ 
           background: 'linear-gradient(to top, transparent 0%, rgba(9,9,11,0.6) 30%, #09090b 50%)',
+          paddingTop: 'env(safe-area-inset-top)',
           paddingBottom: '55px'
         }}
       >
@@ -228,7 +229,7 @@ export default function BrauereiApp() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-[640px] mx-auto px-6 pt-[104px]" style={{ paddingBottom: 'calc(100px + env(safe-area-inset-bottom))' }}>
+      <main className="max-w-[640px] mx-auto px-6" style={{ paddingTop: 'calc(104px + env(safe-area-inset-top))', paddingBottom: 'calc(100px + env(safe-area-inset-bottom))' }}>
         {/* Route Tab */}
         {activeTab === 'route' && (
           <div className={cn("flex flex-col gap-5 animate-in fade-in duration-300", slideDirection === 'right' ? "tab-slide-from-right" : "tab-slide-from-left")}>
@@ -1342,19 +1343,22 @@ function Overlay({
         className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={onClose}
       />
-      {/* bg-zinc-900 + paddingBottom fills the safe-area gap so the sheet colour
-          extends flush to the physical screen edge (home indicator area) */}
-      <div className="relative shrink-0 bg-zinc-900" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      {/* Outer wrapper: rounded corners, bg-fill, safe-area padding, drag transform and
+          slide-in animation all live here so the background never cuts out */}
+      <div 
+        className="relative shrink-0 bg-zinc-900 rounded-t-3xl animate-in slide-in-from-bottom duration-300"
+        style={{
+          paddingBottom: 'env(safe-area-inset-bottom)',
+          transform: dragY > 0 ? `translateY(${dragY}px)` : undefined,
+          transition: dragY === 0 ? 'transform 0.25s ease' : 'none'
+        }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         <div 
           ref={sheetRef}
-          className="relative bg-zinc-900 rounded-t-3xl max-h-[85dvh] overflow-y-auto animate-in slide-in-from-bottom duration-300"
-          style={{
-            transform: dragY > 0 ? `translateY(${dragY}px)` : undefined,
-            transition: dragY === 0 ? 'transform 0.25s ease' : 'none'
-          }}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
+          className="max-h-[85dvh] overflow-y-auto"
         >
           <div className="flex justify-center pt-2.5 pb-0 cursor-grab active:cursor-grabbing">
             <div className="w-9 h-1 rounded-full bg-zinc-700" />
