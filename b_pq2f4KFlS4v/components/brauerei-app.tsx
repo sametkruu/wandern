@@ -13,6 +13,11 @@ import { cn } from '@/lib/utils'
 
 type TabType = 'route' | 'stops' | 'journal'
 
+// Map route village display names to brewery loc names where they differ
+const ROUTE_TO_LOC: Record<string, string> = {
+  "Roßdorf am Forst": "Roßdorf",
+}
+
 export default function BrauereiApp() {
   const [activeTab, setActiveTab] = useState<TabType>('route')
   const [expandedDays, setExpandedDays] = useState<Set<number>>(new Set([1]))
@@ -239,16 +244,21 @@ export default function BrauereiApp() {
                       "text-xs font-semibold tracking-wider mb-1",
                       dayComplete ? "text-emerald-500/70" : "text-zinc-500"
                     )}>
-                      Day {day.day}
+                      Day {day.day}{' '}
+                      <span className={cn(
+                        "font-normal",
+                        dayComplete ? "text-emerald-500/50" : "text-zinc-600"
+                      )}>·</span>{' '}
+                      <span className={cn(
+                        "font-normal",
+                        dayComplete ? "text-emerald-500/50" : "text-zinc-600"
+                      )}>{day.date}</span>
                     </p>
                     <h2 className={cn(
                       "text-2xl font-bold tracking-tight flex items-center gap-3",
                       dayComplete ? "text-emerald-500" : "text-zinc-50"
                     )}>
-                      {day.date} <span className={cn(
-                        "text-zinc-500",
-                        dayComplete && "text-emerald-500/60"
-                      )}>·</span> {day.title}
+                      {day.title}
                       <span className="relative top-1">
                         {dayComplete ? (
                           <CheckCircleIcon size={27} color="#12d492" />
@@ -272,16 +282,16 @@ export default function BrauereiApp() {
                     
                     {/* Timeline */}
                     <div className="mt-5 pl-6">
-                      {day.villages.map((v, i) => (
+                      {day.villages.map((v, i) => {
+                        const locName = ROUTE_TO_LOC[v.n] ?? v.n
+                        const villageBrews = BREWERIES.filter(b => b.day === day.day && b.loc === locName)
+                        const villageComplete = villageBrews.length > 0 && villageBrews.every(b => visited.has(b.id))
+                        return (
                         <div key={i} className="flex gap-3 relative">
                           <div className="flex flex-col items-center w-5 shrink-0 pt-1">
                             <div className={cn(
                               "w-2.5 h-2.5 rounded-full z-10",
-                              v.tag === 'Start' ? "bg-emerald-500" :
-                              v.tag === 'Basecamp' ? "bg-amber-500" :
-                              v.tag === 'Finish' ? "bg-blue-400" :
-                              v.tag === 'Return' ? "bg-violet-400" :
-                              "bg-zinc-600"
+                              villageComplete ? "bg-emerald-500" : "bg-zinc-600"
                             )} />
                             {i < day.villages.length - 1 && (
                               <div className="w-0.5 flex-1 bg-zinc-800 min-h-[44px]" />
@@ -317,7 +327,8 @@ export default function BrauereiApp() {
                             )}
                           </div>
                         </div>
-                      ))}
+                        )
+                      })}
                     </div>
                     
                     <p className="text-[13px] text-zinc-500 leading-relaxed mt-2 pl-6">{day.vibe}</p>
@@ -885,7 +896,7 @@ function BreweryCard({
             {brewery.loc} · {isBrew ? 'Brewery' : 'Beergarden'} · {km?.c || '?'}
             {brewery.food && (
               <span className="inline-flex align-middle relative -top-px ml-1">
-                <UtensilsIcon size={12} color={isVisited ? visitedColor : '#8a8a92'} />
+                <UtensilsIcon size={12} color={isVisited ? visitedColor : (isExpanded ? '#71717a' : '#52525b')} />
               </span>
             )}
           </p>
@@ -902,11 +913,11 @@ function BreweryCard({
           )}
           style={{ 
             borderColor: isVisited ? visitedColor : 'var(--border)',
-            background: isVisited ? visitedColor : 'transparent'
+            background: 'transparent'
           }}
           onClick={(e) => { e.stopPropagation(); onToggleVisit() }}
         >
-          {isVisited && <CheckIcon size={14} color="#000" strokeWidth={3} />}
+          {isVisited && <CheckIcon size={14} color={visitedColor} strokeWidth={3} />}
         </div>
       </div>
       
