@@ -1315,7 +1315,7 @@ function Modal({
         className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={onClose}
       />
-      <div className="relative w-full max-w-sm bg-transparent rounded-3xl shadow-2xl animate-in zoom-in-95 fade-in duration-300 max-h-[85dvh] overflow-y-auto">
+      <div className="relative w-full max-w-sm bg-zinc-900/90 rounded-3xl shadow-2xl animate-in zoom-in-95 fade-in duration-300 max-h-[85dvh] overflow-y-auto">
         {children}
       </div>
     </div>
