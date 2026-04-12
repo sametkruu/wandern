@@ -6,7 +6,7 @@ import { BREWERIES, ROUTE_DAYS, GUIDE, BREWERY_KM, KM_MAP, VILLAGE_MESSAGES, DAY
 import { 
   BeerIcon, WheatIcon, TreeIcon, FootIcon, PhoneIcon, GlobeIcon, PinIcon, 
   AlertIcon, UtensilsIcon, CheckIcon, ChatIcon, BookIcon, 
-  ChevronIcon, ChevronRightIcon, PenIcon, TrashIcon, PlusIcon, CloseIcon,
+  ChevronIcon, ChevronRightIcon, PenIcon, TrashIcon, PlusIcon, MinusIcon, CloseIcon,
   CompassIcon, BackpackIcon, NotebookPenIcon
 } from '@/components/icons'
 import { cn } from '@/lib/utils'
@@ -437,16 +437,27 @@ export default function BrauereiApp() {
                           </p>
                         )}
                       </div>
-                      <ChevronIcon 
-                        size={18} 
-                        className={cn(
-                          "transition-transform mt-1",
-                          !isExpanded && "-rotate-90",
-                          dayComplete
-                            ? (isExpanded ? "text-emerald-500" : "text-emerald-700")
-                            : (isExpanded ? "text-zinc-50" : "text-zinc-600")
-                        )}
-                      />
+                      {isExpanded ? (
+                        <MinusIcon 
+                          size={22} 
+                          className={cn(
+                            "transition-colors mt-1",
+                            dayComplete
+                              ? "text-emerald-500"
+                              : "text-zinc-50"
+                          )}
+                        />
+                      ) : (
+                        <PlusIcon 
+                          size={22} 
+                          className={cn(
+                            "transition-colors mt-1",
+                            dayComplete
+                              ? "text-emerald-700"
+                              : "text-zinc-600"
+                          )}
+                        />
+                      )}
                     </div>
                   </div>
 
