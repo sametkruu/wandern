@@ -973,7 +973,7 @@ function BreweryCard({
           <div className="mt-5">
             <div className="flex items-center gap-2 mb-2.5 relative min-h-[22px]">
               <span className="absolute -left-[25px] -translate-x-1/2 top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
-                <BeerIcon size={15} color="#8a8a92" />
+                <BeerIcon size={15} color="#fafafa" />
               </span>
               <span className="text-[13px] font-semibold text-zinc-300">Beer</span>
             </div>
@@ -986,7 +986,7 @@ function BreweryCard({
           <div className="mt-5">
             <div className="flex items-center gap-2 mb-2.5 relative min-h-[22px]">
               <span className="absolute -left-[25px] -translate-x-1/2 top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
-                <UtensilsIcon size={15} color="#8a8a92" />
+                <UtensilsIcon size={15} color="#fafafa" />
               </span>
               <span className="text-[13px] font-semibold text-zinc-300">Food</span>
             </div>
@@ -999,7 +999,7 @@ function BreweryCard({
           <div className="mt-5">
             <div className="flex items-center gap-2 mb-2.5 relative min-h-[22px]">
               <span className="absolute -left-[25px] -translate-x-1/2 top-1/2 -translate-y-1/2 bg-[#09090b] p-0.5 rounded">
-                <BookIcon size={15} color="#8a8a92" />
+                <BookIcon size={15} color="#fafafa" />
               </span>
               <span className="text-[13px] font-semibold text-zinc-300">From the guide</span>
             </div>
