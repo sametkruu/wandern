@@ -274,7 +274,7 @@ export default function BrauereiApp() {
                     </p>
                     
                     {/* Timeline */}
-                    <div className="mt-5 pl-6">
+                    <div className="mt-5">
                       {day.villages.map((v, i) => {
                         const locName = ROUTE_TO_LOC[v.n] ?? v.n
                         const villageBrews = BREWERIES.filter(b => b.day === day.day && b.loc === locName)
@@ -1261,8 +1261,7 @@ function NavButton({
     <button
       onClick={onClick}
       className={cn(
-        "flex flex-col gap-1.5 py-2",
-        align === 'end' ? "items-end" : "items-start"
+        "flex flex-col gap-1.5 py-2 items-center"
       )}
     >
       {icon}
