@@ -216,7 +216,7 @@ export default function BrauereiApp() {
           paddingBottom: '55px'
         }}
       >
-        <div className="max-w-[640px] mx-auto px-6 pt-1 pb-1 flex items-center justify-between pointer-events-auto">
+        <div className="max-w-[640px] mx-auto px-6 pt-3 pb-1 flex items-center justify-between pointer-events-auto">
           <div>
             <h1 className="text-[26px] font-semibold text-zinc-50 tracking-tight leading-[23px]">Fränkischer Wandern</h1>
             <p className="text-[11px] text-zinc-500 font-medium tracking-wide mt-[4px]">Der 13 Brauereien Weg</p>
@@ -687,7 +687,7 @@ export default function BrauereiApp() {
         style={{ 
           background: 'linear-gradient(to bottom, transparent 0%, rgba(9,9,11,0.92) 30%, #09090b 55%, #09090b 100%)',
           paddingTop: '32px',
-          paddingBottom: 'var(--safe-area-bottom)'
+          paddingBottom: 'calc(var(--safe-area-bottom) + 8px)'
         }}
       >
         <div className="max-w-[640px] w-full mx-auto px-6 flex justify-between">
