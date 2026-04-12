@@ -1099,9 +1099,9 @@ function JournalTab({
   return (
     <div className={cn("animate-in fade-in duration-300", slideDirection === 'right' ? "tab-slide-from-right" : "tab-slide-from-left")}>
       <div className="flex items-center justify-between mb-5">
-        <span className="text-[13px] font-semibold text-zinc-500">
-          {totalCount} note{totalCount === 1 ? '' : 's'}
-        </span>
+        <h1 className="text-2xl font-bold text-zinc-50 tracking-tight">
+          {totalCount} Note{totalCount === 1 ? '' : 's'}
+        </h1>
         <div className="flex bg-zinc-800/80 rounded-lg p-0.5 border border-zinc-700/50">
           <button
             onClick={() => setJournalSort('stop')}
