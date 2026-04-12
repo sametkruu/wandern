@@ -68,12 +68,26 @@ export default function BrauereiApp() {
       const dayItems = BREWERIES.filter(b => b.day === brewery.day)
       const dayComplete = dayItems.every(b => newVisited.has(b.id))
       
-      // Close expanded card
+      // Find next unvisited brewery in the same day
+      const currentIndex = dayItems.findIndex(b => b.id === brewery.id)
+      const nextBrewery = dayItems.slice(currentIndex + 1).find(b => !newVisited.has(b.id))
+
+      // Close expanded card, then open next if any
       setExpandedCards(prev => {
         const next = new Set(prev)
         next.delete(brewery.id)
+        if (nextBrewery && !dayComplete) {
+          next.add(nextBrewery.id)
+        }
         return next
       })
+
+      if (nextBrewery && !dayComplete) {
+        setTimeout(() => {
+          const el = document.getElementById(`brewery-${nextBrewery.id}`)
+          if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' })
+        }, 350)
+      }
       
       if (villageComplete && !dayComplete) {
         const vm = VILLAGE_MESSAGES[brewery.loc]
