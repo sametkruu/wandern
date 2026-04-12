@@ -16,6 +16,7 @@ export const metadata: Metadata = {
     title: 'Brauereien Weg',
   },
   icons: {
+    apple: '/apple-icon.png',
     icon: [
       {
         url: '/icon-light-32x32.png',
