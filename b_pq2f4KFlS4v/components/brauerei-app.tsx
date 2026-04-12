@@ -12,6 +12,7 @@ import {
 import { cn } from '@/lib/utils'
 
 type TabType = 'route' | 'stops' | 'journal'
+const TAB_ORDER: TabType[] = ['route', 'stops', 'journal']
 
 // Map route village display names to brewery loc names where they differ
 const ROUTE_TO_LOC: Record<string, string> = {
@@ -20,6 +21,7 @@ const ROUTE_TO_LOC: Record<string, string> = {
 
 export default function BrauereiApp() {
   const [activeTab, setActiveTab] = useState<TabType>('route')
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right')
   const [expandedDays, setExpandedDays] = useState<Set<number>>(new Set([1]))
   const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set())
   const [showPackDrawer, setShowPackDrawer] = useState(false)
@@ -166,9 +168,10 @@ export default function BrauereiApp() {
   }, [visited])
 
   const switchTab = useCallback((tab: TabType) => {
+    setSlideDirection(TAB_ORDER.indexOf(tab) > TAB_ORDER.indexOf(activeTab) ? 'right' : 'left')
     setActiveTab(tab)
     window.scrollTo(0, 0)
-  }, [])
+  }, [activeTab])
 
   const goToDay = useCallback((day: number) => {
     setExpandedDays(new Set([day]))
@@ -228,7 +231,7 @@ export default function BrauereiApp() {
       <main className="max-w-[640px] mx-auto px-6 pt-[104px]" style={{ paddingBottom: 'calc(100px + env(safe-area-inset-bottom))' }}>
         {/* Route Tab */}
         {activeTab === 'route' && (
-          <div className="flex flex-col gap-5 animate-in fade-in slide-in-from-right-10 duration-300">
+          <div className={cn("flex flex-col gap-5 animate-in fade-in duration-300", slideDirection === 'right' ? "tab-slide-from-right" : "tab-slide-from-left")}>
             {ROUTE_DAYS.map(day => {
               const dayComplete = isDayComplete(day.day)
               const dayBreweries = BREWERIES.filter(b => b.day === day.day)
@@ -334,7 +337,7 @@ export default function BrauereiApp() {
 
         {/* Stops Tab */}
         {activeTab === 'stops' && (
-          <div className="relative flex flex-col gap-2 animate-in fade-in slide-in-from-right-10 duration-300 pb-4 -ml-2">
+          <div className={cn("relative flex flex-col gap-2 animate-in fade-in duration-300 pb-4 -ml-2", slideDirection === 'right' ? "tab-slide-from-right" : "tab-slide-from-left")}>
             {/* Dotted vertical timeline */}
             <div 
               className="absolute top-4 bottom-8 left-[15px] w-[3px] -translate-x-1/2 z-0"
@@ -565,6 +568,7 @@ export default function BrauereiApp() {
             setJournalSort={setJournalSort}
             onEditNote={handleEditNote}
             onDeleteNote={deleteNote}
+            slideDirection={slideDirection}
           />
         )}
       </main>
@@ -1044,13 +1048,15 @@ function JournalTab({
   journalSort, 
   setJournalSort,
   onEditNote,
-  onDeleteNote
+  onDeleteNote,
+  slideDirection
 }: { 
   notes: Record<number, NoteEntry[]>
   journalSort: 'stop' | 'type'
   setJournalSort: (s: 'stop' | 'type') => void
   onEditNote: (breweryId: number, note: NoteEntry) => void
   onDeleteNote: (breweryId: number, noteId: number) => void
+  slideDirection: 'left' | 'right'
 }) {
   const allNotes: { brew: Brewery | undefined; entry: NoteEntry; brewId: number }[] = []
   
@@ -1066,7 +1072,7 @@ function JournalTab({
 
   if (!totalCount) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-260px)] text-center animate-in fade-in slide-in-from-left-10 duration-300">
+      <div className={cn("flex flex-col items-center justify-center min-h-[calc(100dvh-260px)] text-center animate-in fade-in duration-300", slideDirection === 'right' ? "tab-slide-from-right" : "tab-slide-from-left")}>
         <div className="text-3xl font-bold text-zinc-50 tracking-tight">No notes yet</div>
         <div className="text-[11px] font-medium text-zinc-600 mt-2 tracking-wide">
           Open a stop and tap Add Note to start your notes
@@ -1094,7 +1100,7 @@ function JournalTab({
   }
 
   return (
-    <div className="animate-in fade-in slide-in-from-left-10 duration-300">
+    <div className={cn("animate-in fade-in duration-300", slideDirection === 'right' ? "tab-slide-from-right" : "tab-slide-from-left")}>
       <div className="flex items-center justify-between mb-5">
         <span className="text-[13px] font-semibold text-zinc-500">
           {totalCount} note{totalCount === 1 ? '' : 's'}
