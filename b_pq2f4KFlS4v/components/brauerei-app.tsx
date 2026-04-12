@@ -431,11 +431,13 @@ export default function BrauereiApp() {
                         )}
                       </div>
                       <ChevronIcon 
-                        size={14} 
-                        color="#71717a"
+                        size={18} 
                         className={cn(
                           "transition-transform mt-1",
-                          !isExpanded && "-rotate-90"
+                          !isExpanded && "-rotate-90",
+                          dayComplete
+                            ? (isExpanded ? "text-emerald-500" : "text-emerald-700")
+                            : (isExpanded ? "text-zinc-50" : "text-zinc-600")
                         )}
                       />
                     </div>
