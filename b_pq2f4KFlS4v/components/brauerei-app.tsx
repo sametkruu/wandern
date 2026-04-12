@@ -821,7 +821,7 @@ export default function BrauereiApp() {
 
       {/* Day Complete Toast */}
       {showToast && toastData && (
-        <div className="fixed inset-0 z-[200] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[200] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300">
           <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 text-center w-[80%] max-w-[640px] animate-in zoom-in-95 duration-300">
             <div className="text-5xl mb-4">{toastData.i}</div>
             <div className="text-sm font-medium text-zinc-500 mb-1">{toastData.t}</div>
@@ -1312,7 +1312,7 @@ function Modal({
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
       <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={onClose}
       />
       <div className="relative w-full max-w-sm bg-zinc-900/90 rounded-3xl shadow-2xl animate-in zoom-in-95 fade-in duration-300 max-h-[85dvh] overflow-y-auto">
