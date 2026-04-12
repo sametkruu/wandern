@@ -205,7 +205,7 @@ export default function BrauereiApp() {
           paddingBottom: '55px'
         }}
       >
-        <div className="max-w-[640px] mx-auto px-4 py-3 flex items-center justify-between pointer-events-auto">
+        <div className="max-w-[640px] mx-auto px-4 py-1 flex items-center justify-between pointer-events-auto">
           <div>
             <h1 className="text-[26px] font-semibold text-zinc-50 tracking-tight">Fränkischer Wandern</h1>
             <p className="text-[11px] text-zinc-500 font-medium tracking-wide mt-0.5">Der 13 Brauereien Weg</p>
