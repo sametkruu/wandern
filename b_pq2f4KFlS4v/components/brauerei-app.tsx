@@ -627,7 +627,7 @@ export default function BrauereiApp() {
                     <SwipeableItem
                       key={item.id}
                       actions={packActions}
-                      bgColor="#18181b"
+                      bgColor="transparent"
                       className={cn("rounded-lg", packed.has(item.id) && "opacity-60")}
                     >
                       <div className="flex items-center gap-3 py-2.5">
