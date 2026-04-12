@@ -198,7 +198,7 @@ export default function BrauereiApp() {
   const packedCount = packed.size
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-zinc-300">
+    <div className="min-h-dvh bg-[#09090b] text-zinc-300">
       {/* Header */}
       <header 
         className={cn(
@@ -225,7 +225,7 @@ export default function BrauereiApp() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-[640px] mx-auto px-6 pt-[104px] pb-[100px]">
+      <main className="max-w-[640px] mx-auto px-6 pt-[104px]" style={{ paddingBottom: 'calc(100px + env(safe-area-inset-bottom))' }}>
         {/* Route Tab */}
         {activeTab === 'route' && (
           <div className="flex flex-col gap-5 animate-in fade-in slide-in-from-right-10 duration-300">
