@@ -651,7 +651,7 @@ export default function BrauereiApp() {
                         e.stopPropagation()
                         openPrompt('Edit item:', item.text, (text) => editPackItem(item.id, text))
                       }}
-                      className="flex items-center justify-center px-4 rounded-xl bg-zinc-700"
+                      className="flex items-center justify-center px-4 rounded-lg bg-zinc-700"
                     >
                       <PenIcon size={18} color="#a1a1aa" />
                     </button>
@@ -660,7 +660,7 @@ export default function BrauereiApp() {
                         e.stopPropagation()
                         deletePackItem(item.id)
                       }}
-                      className="flex items-center justify-center px-4 rounded-xl bg-red-500/20"
+                      className="flex items-center justify-center px-4 rounded-lg bg-red-500/20"
                     >
                       <TrashIcon size={18} color="#f87171" />
                     </button>
@@ -1152,13 +1152,13 @@ function JournalTab({
                     <>
                       <button
                         onClick={() => onEditNote(Number(gid), entry)}
-                        className="flex items-center justify-center px-4 my-2 rounded-xl bg-white/10 backdrop-blur-xl"
+                        className="flex items-center justify-center px-4 my-2 rounded-lg bg-white/10 backdrop-blur-xl"
                       >
                         <PenIcon size={18} color="#d4d4d8" />
                       </button>
                       <button
                         onClick={() => onDeleteNote(Number(gid), entry.id)}
-                        className="flex items-center justify-center px-4 my-2 rounded-xl bg-red-500/20"
+                        className="flex items-center justify-center px-4 my-2 rounded-lg bg-red-500/20"
                       >
                         <TrashIcon size={18} color="#f87171" />
                       </button>
@@ -1206,13 +1206,13 @@ function JournalTab({
                   <>
                     <button
                       onClick={() => onEditNote(n.brewId, n.entry)}
-                      className="flex items-center justify-center px-4 my-2 rounded-xl bg-white/10 backdrop-blur-xl"
+                      className="flex items-center justify-center px-4 my-2 rounded-lg bg-white/10 backdrop-blur-xl"
                     >
                       <PenIcon size={18} color="#d4d4d8" />
                     </button>
                     <button
                       onClick={() => onDeleteNote(n.brewId, n.entry.id)}
-                      className="flex items-center justify-center px-4 my-2 rounded-xl bg-red-500/20"
+                      className="flex items-center justify-center px-4 my-2 rounded-lg bg-red-500/20"
                     >
                       <TrashIcon size={18} color="#f87171" />
                     </button>
