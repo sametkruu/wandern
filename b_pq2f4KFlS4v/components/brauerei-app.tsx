@@ -324,7 +324,7 @@ export default function BrauereiApp() {
                       })}
                     </div>
                     
-                    <p className="text-[13px] text-zinc-500 leading-relaxed mt-2 pl-6">{day.vibe}</p>
+                    <p className="text-[13px] text-zinc-500 leading-relaxed mt-2">{day.vibe}</p>
                   </div>
                 </div>
               )
