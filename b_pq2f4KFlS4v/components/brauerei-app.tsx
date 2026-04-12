@@ -1298,6 +1298,14 @@ function Overlay({
   const isDraggingRef = useRef(false)
   const sheetRef = useRef<HTMLDivElement>(null)
 
+  // Lock body scroll while sheet is open so background content can't scroll
+  useEffect(() => {
+    if (!open) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [open])
+
   if (!open) return null
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -1334,7 +1342,9 @@ function Overlay({
         className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={onClose}
       />
-      <div className="relative shrink-0">
+      {/* bg-zinc-900 + paddingBottom fills the safe-area gap so the sheet colour
+          extends flush to the physical screen edge (home indicator area) */}
+      <div className="relative shrink-0 bg-zinc-900" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <div 
           ref={sheetRef}
           className="relative bg-zinc-900 rounded-t-3xl max-h-[85dvh] overflow-y-auto animate-in slide-in-from-bottom duration-300"
@@ -1351,8 +1361,6 @@ function Overlay({
           </div>
           {children}
         </div>
-        {/* Extends sheet bg seamlessly behind the native keyboard */}
-        <div className="absolute left-0 right-0 top-full bg-zinc-900 h-dvh pointer-events-none" />
       </div>
     </div>
   )
