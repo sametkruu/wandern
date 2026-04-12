@@ -259,12 +259,8 @@ export default function BrauereiApp() {
                       dayComplete ? "text-emerald-500" : "text-zinc-50"
                     )}>
                       {day.title}
-                      <span className="relative top-1">
-                        {dayComplete ? (
-                          <CheckCircleIcon size={27} color="#12d492" />
-                        ) : (
-                          <ChevronRightIcon size={27} color="#fafafa" />
-                        )}
+                      <span>
+                        <ChevronRightIcon size={27} color={dayComplete ? "#12d492" : "#fafafa"} />
                       </span>
                     </h2>
                     <p className={cn(
@@ -409,8 +405,8 @@ export default function BrauereiApp() {
                         >
                           Day {day}
                           <ChevronIcon 
-                            size={32} 
-                            color={isExpanded ? "#fafafa" : "#71717a"}
+                            size={16} 
+                            color={dayComplete ? (isExpanded ? "#10b981" : "#047857") : (isExpanded ? "#fafafa" : "#71717a")}
                             className={cn(
                               "transition-transform transition-colors",
                               !isExpanded && "-rotate-90"
