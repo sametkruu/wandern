@@ -299,7 +299,7 @@ export default function BrauereiApp() {
                           </div>
                           <div className="pb-4">
                             <div className="flex items-center gap-2">
-                              <span className="text-sm font-semibold text-zinc-300">{v.n}</span>
+                              <span className={cn("text-sm font-semibold", villageComplete ? "text-emerald-500" : "text-zinc-300")}>{v.n}</span>
                               {v.tag && (
                                 <span className={cn(
                                   "text-[9px] font-semibold rounded-md px-1.5 py-0.5 tracking-wider uppercase border",
@@ -376,7 +376,7 @@ export default function BrauereiApp() {
                 <div key={day} id={`day-${day}`} className="scroll-mt-[104px]">
                   {/* Day Header */}
                   <div 
-                    className="pt-6 pb-4 cursor-pointer relative pl-14"
+                    className="pt-6 pb-4 cursor-pointer relative pl-[52px]"
                     onClick={() => setExpandedDays(prev => {
                       const next = new Set(prev)
                       if (next.has(day)) {
@@ -456,7 +456,7 @@ export default function BrauereiApp() {
                     <div className="overflow-hidden">
                       {/* Start waypoints (pass-through villages at beginning of day) */}
                       {STOPS_WAYPOINTS[day]?.start.map((wp, i) => (
-                        <div key={`start-${wp.n}-${i}`} className="relative z-10 py-2 pl-14">
+                        <div key={`start-${wp.n}-${i}`} className="relative z-10 py-2 pl-[52px]">
                           <div 
                             className="absolute left-[27px] top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full z-10 transition-colors"
                             style={{ 
@@ -476,18 +476,20 @@ export default function BrauereiApp() {
                         </div>
                       ))}
                       
-                      {locationGroups.map((group, gi) => (
+                      {locationGroups.map((group, gi) => {
+                        const villageComplete = group.breweries.every(b => visited.has(b.id))
+                        return (
                         <div key={group.loc}>
                           {/* Location Header */}
-                          <div className="relative z-10 py-2 pl-14">
+                          <div className="relative z-10 py-2 pl-[52px]">
                             <div 
-                              className="absolute left-[27px] top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full z-10"
-                              style={{ background: '#3f3f46', boxShadow: '0 0 0 3px #09090b' }}
+                              className="absolute left-[27px] top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full z-10 transition-colors"
+                              style={{ background: villageComplete ? '#2a8d65' : '#3f3f46', boxShadow: '0 0 0 3px #09090b' }}
                             />
                             <span className="text-[10px] font-medium text-zinc-600 mr-2">
                               {KM_MAP[group.loc]?.c ? `km ${KM_MAP[group.loc].c}` : ''}
                             </span>
-                            <span className="text-[11px] font-semibold text-zinc-600 tracking-wider uppercase">
+                            <span className={cn("text-[11px] font-semibold tracking-wider uppercase transition-colors", villageComplete ? "text-emerald-700" : "text-zinc-600")}>
                               {group.loc}
                             </span>
                             {day > 1 && KM_MAP[group.loc]?.r && (
@@ -527,11 +529,12 @@ export default function BrauereiApp() {
                             />
                           ))}
                         </div>
-                      ))}
+                        )
+                      })}
                       
                       {/* End waypoints (pass-through villages at end of day) */}
                       {STOPS_WAYPOINTS[day]?.end.map((wp, i) => (
-                        <div key={`end-${wp.n}-${i}`} className="relative z-10 py-2 pl-14">
+                        <div key={`end-${wp.n}-${i}`} className="relative z-10 py-2 pl-[52px]">
                           <div 
                             className="absolute left-[27px] top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full z-10 transition-colors"
                             style={{ 
@@ -872,7 +875,7 @@ function BreweryCard({
     <div id={`brewery-${brewery.id}`} className="relative z-10 mb-3 scroll-mt-[104px]">
       {/* Header */}
       <div 
-        className="py-4 pl-14 flex items-start gap-3 cursor-pointer relative"
+        className="py-4 pl-[52px] flex items-start gap-3 cursor-pointer relative"
         onClick={onToggleExpand}
       >
         <span 
@@ -925,7 +928,7 @@ function BreweryCard({
       
       {/* Body */}
       <div className={cn(
-        "overflow-hidden transition-all duration-300 pl-14",
+        "overflow-hidden transition-all duration-300 pl-[52px]",
         isExpanded ? "max-h-[2000px] opacity-100 pb-6" : "max-h-0 opacity-0"
       )}>
         {/* Tags */}
@@ -1354,7 +1357,7 @@ function Overlay({
 function SwipeableItem({
   children,
   actions,
-  actionWidth = 96,
+  actionWidth = 120,
   bgColor = '#18181b',
   className
 }: {
@@ -1378,7 +1381,7 @@ function SwipeableItem({
     <div className={cn('relative overflow-hidden group', className)}>
       {/* Mobile: action buttons sit behind content, revealed by swiping left */}
       <div
-        className="sm:hidden absolute inset-y-0 right-0 flex items-center justify-center gap-2"
+        className="sm:hidden absolute inset-y-0 right-0 flex flex-col gap-1 p-1 [&>button]:flex-1 [&>button]:flex [&>button]:items-center [&>button]:justify-center"
         style={{ width: actionWidth }}
       >
         {actions}
@@ -1386,6 +1389,7 @@ function SwipeableItem({
 
       {/* Slideable content */}
       <div
+        className="rounded-r-xl"
         style={{
           background: bgColor,
           transform: `translateX(${offset}px)`,
