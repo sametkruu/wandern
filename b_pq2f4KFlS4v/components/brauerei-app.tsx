@@ -12,7 +12,7 @@ import {
 import { cn } from '@/lib/utils'
 
 type TabType = 'route' | 'stops' | 'journal' | 'pack'
-const TAB_ORDER: TabType[] = ['route', 'stops', 'journal', 'pack']
+const TAB_ORDER: TabType[] = ['stops', 'route', 'journal', 'pack']
 
 // Map route village display names to brewery loc names where they differ
 const ROUTE_TO_LOC: Record<string, string> = {
@@ -20,7 +20,7 @@ const ROUTE_TO_LOC: Record<string, string> = {
 }
 
 export default function BrauereiApp() {
-  const [activeTab, setActiveTab] = useState<TabType>('route')
+  const [activeTab, setActiveTab] = useState<TabType>('stops')
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right')
   const [expandedDays, setExpandedDays] = useState<Set<number>>(new Set([1]))
   const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set())
@@ -684,16 +684,16 @@ export default function BrauereiApp() {
         <div className="max-w-[640px] w-full mx-auto px-6 flex justify-between">
           <div className="flex gap-12 pointer-events-auto">
             <NavButton 
-              icon={<CompassIcon size={22} color={activeTab === 'route' ? '#fafafa' : '#52525b'} strokeWidth={activeTab === 'route' ? 2.5 : 2} />}
-              label="Route"
-              active={activeTab === 'route'}
-              onClick={() => switchTab('route')}
-            />
-            <NavButton 
               icon={<BeerIcon size={22} color={activeTab === 'stops' ? '#fafafa' : '#52525b'} strokeWidth={activeTab === 'stops' ? 2.5 : 2} />}
               label="Stops"
               active={activeTab === 'stops'}
               onClick={() => switchTab('stops')}
+            />
+            <NavButton 
+              icon={<CompassIcon size={22} color={activeTab === 'route' ? '#fafafa' : '#52525b'} strokeWidth={activeTab === 'route' ? 2.5 : 2} />}
+              label="Route"
+              active={activeTab === 'route'}
+              onClick={() => switchTab('route')}
             />
             <NavButton 
               icon={<NotebookPenIcon size={22} color={activeTab === 'journal' ? '#fafafa' : '#52525b'} strokeWidth={activeTab === 'journal' ? 2.5 : 2} />}
