@@ -677,8 +677,8 @@ export default function BrauereiApp() {
         className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none"
         style={{ 
           background: 'linear-gradient(to bottom, transparent 0%, rgba(9,9,11,0.8) 20%, #09090b 45%, #09090b 100%)',
-          paddingTop: '50px',
-          paddingBottom: 'calc(16px + env(safe-area-inset-bottom))'
+          paddingTop: '38px',
+          paddingBottom: 'calc(24px + env(safe-area-inset-bottom))'
         }}
       >
         <div className="max-w-[640px] w-full mx-auto px-6 flex justify-between">
