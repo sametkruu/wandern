@@ -5,7 +5,7 @@ import { useVisited, useNotes, usePacking, type NoteEntry } from '@/hooks/use-st
 import { BREWERIES, ROUTE_DAYS, GUIDE, BREWERY_KM, KM_MAP, VILLAGE_MESSAGES, DAY_TOASTS, STOPS_WAYPOINTS, type Brewery } from '@/lib/data'
 import { 
   BeerIcon, WheatIcon, TreeIcon, FootIcon, PhoneIcon, GlobeIcon, PinIcon, 
-  AlertIcon, UtensilsIcon, CheckIcon, CheckCircleIcon, ChatIcon, BookIcon, 
+  AlertIcon, UtensilsIcon, CheckIcon, ChatIcon, BookIcon, 
   ChevronIcon, ChevronRightIcon, PenIcon, TrashIcon, PlusIcon, CloseIcon,
   CompassIcon, BackpackIcon
 } from '@/components/icons'
@@ -255,13 +255,10 @@ export default function BrauereiApp() {
                       )}>{day.date}</span>
                     </p>
                     <h2 className={cn(
-                      "text-2xl font-bold tracking-tight flex items-center gap-3",
+                      "text-2xl font-bold tracking-tight",
                       dayComplete ? "text-emerald-500" : "text-zinc-50"
                     )}>
                       {day.title}
-                      <span>
-                        <ChevronRightIcon size={27} color={dayComplete ? "#12d492" : "#fafafa"} />
-                      </span>
                     </h2>
                     <p className={cn(
                       "text-sm font-semibold mt-1",
@@ -340,7 +337,7 @@ export default function BrauereiApp() {
           <div className="relative flex flex-col gap-2 animate-in fade-in slide-in-from-right-10 duration-300 pb-4">
             {/* Dotted vertical timeline */}
             <div 
-              className="absolute top-4 bottom-8 left-[27px] w-[3px] -translate-x-1/2 z-0"
+              className="absolute top-4 bottom-8 left-[15px] w-[3px] -translate-x-1/2 z-0"
               style={{
                 background: '#27272a',
                 maskImage: 'radial-gradient(circle 1.5px, #000 100%, transparent 100%)',
@@ -372,7 +369,7 @@ export default function BrauereiApp() {
                 <div key={day} id={`day-${day}`} className="scroll-mt-[104px]">
                   {/* Day Header */}
                   <div 
-                    className="pt-6 pb-4 cursor-pointer relative pl-[52px]"
+                    className="pt-6 pb-4 cursor-pointer relative pl-[40px]"
                     onClick={() => setExpandedDays(prev => {
                       const next = new Set(prev)
                       if (next.has(day)) {
@@ -386,7 +383,7 @@ export default function BrauereiApp() {
                     {/* Rectangle marker for day headers */}
                     <div 
                       className={cn(
-                        "absolute left-[27px] top-6 -translate-x-1/2 w-1.5 h-14 rounded-sm z-10 transition-colors",
+                        "absolute left-[15px] top-6 -translate-x-1/2 w-1.5 h-14 rounded-sm z-10 transition-colors",
                         dayComplete 
                           ? (isExpanded ? "bg-emerald-500" : "bg-emerald-700")
                           : (isExpanded ? "bg-zinc-50" : "bg-zinc-600")
@@ -405,7 +402,7 @@ export default function BrauereiApp() {
                         >
                           Day {day}
                           <ChevronIcon 
-                            size={16} 
+                            size={8} 
                             color={dayComplete ? (isExpanded ? "#10b981" : "#047857") : (isExpanded ? "#fafafa" : "#71717a")}
                             className={cn(
                               "transition-transform transition-colors",
@@ -452,9 +449,9 @@ export default function BrauereiApp() {
                     <div className="overflow-hidden">
                       {/* Start waypoints (pass-through villages at beginning of day) */}
                       {STOPS_WAYPOINTS[day]?.start.map((wp, i) => (
-                        <div key={`start-${wp.n}-${i}`} className="relative z-10 py-2 pl-[52px]">
+                        <div key={`start-${wp.n}-${i}`} className="relative z-10 py-2 pl-[40px]">
                           <div 
-                            className="absolute left-[27px] top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full z-10 transition-colors"
+                            className="absolute left-[15px] top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full z-10 transition-colors"
                             style={{ 
                               background: '#3f3f46',
                               boxShadow: '0 0 0 3px #09090b' 
@@ -477,9 +474,9 @@ export default function BrauereiApp() {
                         return (
                         <div key={group.loc}>
                           {/* Location Header */}
-                          <div className="relative z-10 py-2 pl-[52px]">
+                          <div className="relative z-10 py-2 pl-[40px]">
                             <div 
-                              className="absolute left-[27px] top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full z-10 transition-colors"
+                              className="absolute left-[15px] top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full z-10 transition-colors"
                               style={{ background: villageComplete ? '#2a8d65' : '#3f3f46', boxShadow: '0 0 0 3px #09090b' }}
                             />
                             <span className="text-[10px] font-medium text-zinc-600 mr-2">
@@ -530,9 +527,9 @@ export default function BrauereiApp() {
                       
                       {/* End waypoints (pass-through villages at end of day) */}
                       {STOPS_WAYPOINTS[day]?.end.map((wp, i) => (
-                        <div key={`end-${wp.n}-${i}`} className="relative z-10 py-2 pl-[52px]">
+                        <div key={`end-${wp.n}-${i}`} className="relative z-10 py-2 pl-[40px]">
                           <div 
-                            className="absolute left-[27px] top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full z-10 transition-colors"
+                            className="absolute left-[15px] top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full z-10 transition-colors"
                             style={{ 
                               background: '#3f3f46',
                               boxShadow: '0 0 0 3px #09090b' 
@@ -871,11 +868,11 @@ function BreweryCard({
     <div id={`brewery-${brewery.id}`} className="relative z-10 mb-3 scroll-mt-[104px]">
       {/* Header */}
       <div 
-        className="py-4 pl-[52px] flex items-start gap-3 cursor-pointer relative"
+        className="py-4 pl-[40px] flex items-start gap-3 cursor-pointer relative"
         onClick={onToggleExpand}
       >
         <span 
-          className="absolute left-[27px] top-8 -translate-x-1/2 -translate-y-1/2 bg-[#09090b] p-1 rounded z-10"
+          className="absolute left-[15px] top-8 -translate-x-1/2 -translate-y-1/2 bg-[#09090b] p-1 rounded z-10"
         >
           {isBrew 
             ? <WheatIcon size={22} color={isVisited ? visitedColor : activeColor} strokeWidth={2.5} />
@@ -924,7 +921,7 @@ function BreweryCard({
       
       {/* Body */}
       <div className={cn(
-        "overflow-hidden transition-all duration-300 pl-[40px]",
+        "overflow-hidden transition-all duration-300 pl-[28px]",
         isExpanded ? "max-h-[2000px] opacity-100 pb-6" : "max-h-0 opacity-0"
       )}>
         {/* Tags */}
@@ -1353,7 +1350,7 @@ function Overlay({
 function SwipeableItem({
   children,
   actions,
-  actionWidth = 90,
+  actionWidth = 110,
   bgColor = '#18181b',
   className
 }: {
@@ -1377,7 +1374,7 @@ function SwipeableItem({
     <div className={cn('relative overflow-hidden group', className)}>
       {/* Mobile: action buttons sit behind content, revealed by swiping left */}
       <div
-        className="sm:hidden absolute inset-y-0 right-0 flex flex-row gap-1 p-1 [&>button]:flex-1 [&>button]:flex [&>button]:items-center [&>button]:justify-center"
+        className="sm:hidden absolute inset-y-0 right-0 flex flex-row flex-nowrap gap-1 p-1 [&>button]:flex-1 [&>button]:flex [&>button]:items-center [&>button]:justify-center"
         style={{ width: actionWidth }}
       >
         {actions}
@@ -1410,8 +1407,8 @@ function SwipeableItem({
           <div className="flex-1 min-w-0">
             {children}
           </div>
-          {/* Desktop only: action buttons visible on hover */}
-          <div className="hidden sm:flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity px-2 shrink-0">
+          {/* Desktop only: action buttons slide in from right on hover */}
+          <div className="hidden sm:flex items-center gap-2 translate-x-3 opacity-0 pointer-events-none group-hover:translate-x-0 group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 ease-out px-2 shrink-0">
             {actions}
           </div>
         </div>
