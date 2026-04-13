@@ -52,6 +52,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" style={{ backgroundColor: '#09090b' }}>
+      <head>
+        <link rel="apple-touch-icon" href="/wandern/apple-touch-icon.png" />
+      </head>
       <body className="font-sans antialiased overflow-x-hidden" style={{ scrollbarWidth: 'none' }}>
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
