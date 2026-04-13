@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     title: 'Fränkischer Wandern',
   },
   icons: {
-    apple: '/apple-icon.png',
+    apple: '/apple-touch-icon.png',
     icon: [
       {
         url: '/icon-light-32x32.png',
